@@ -1,0 +1,4 @@
+.footer_component a:hover,
+#footer-link-modal:hover {
+  text-decoration: underline;
+}

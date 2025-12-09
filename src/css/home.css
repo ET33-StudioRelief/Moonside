@@ -1,0 +1,113 @@
+/* -----------------section hero-------------- */
+.hero_glow-follow {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  pointer-events: none;
+}
+
+.hero_glow-follow svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+/* -----------------section services-------------- */
+.services_nav-item:hover .icon-1x1-small.is-hide-by-default {
+  width: var(--_responsive---icon--small);
+  opacity: 1;
+}
+
+/* Fade entre les blocs .services_flex */
+.services_flex {
+  transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+/*ANIMATION SECTION SERVICES*/
+/* Initial state services_txt-content */
+.services_txt-content {
+  overflow: hidden;
+  height: auto; /* on neutralise le height:0 défini côté Webflow et on pilote via max-height */
+  max-height: 0;
+  opacity: 0;
+  transition:
+    max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Open state : height "auto" simulated via a max-height sufficiently large */
+.services_item.is-open .services_txt-content {
+  max-height: 100vh; /* ajuste si besoin selon la hauteur max attendue */
+  opacity: 1;
+}
+
+.services_btm-line {
+  position: absolute;
+  z-index: 100;
+  inset: auto 0% 0%;
+  width: 100%; /* largeur finale */
+  height: 1px;
+  background-color: var(--_brand---border--secondary);
+  transform: scaleX(0); /* cachée par défaut */
+  transform-origin: left;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.services_title:hover .services_btm-line {
+  transform: scaleX(1);
+}
+
+/* -----------------section hp case-------------- */
+
+/* État par défaut : on prépare une transition douce sur l'opacité */
+[data-button='case-card'] {
+  transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Bouton de case : affichage au hover de l'image */
+.case_card-img-wrap:hover [data-button='case-card'] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* -----------------section hp industries-------------- */
+.hp-industries_cat-btm-line {
+  width: 100%; /* largeur finale */
+  transform: scaleX(0); /* cachée par défaut */
+  transform-origin: left;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.hp-industries_cat:hover .hp-industries_cat-btm-line {
+  transform: scaleX(1);
+}
+
+.hp-industries_cat:hover .icon-1x1-small.is-hide-by-default {
+  width: var(--_responsive---icon--small);
+}
+
+/* Icône */
+.hp-industries_cat .icon-1x1-small.is-hide-by-default {
+  transition:
+    opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hp-industries_cat.is-active .icon-1x1-small.is-hide-by-default {
+  opacity: 1;
+  width: var(--_responsive---icon--small);
+}
+.hp-industries_cat.is-active {
+  color: var(--_brand---text--primary);
+}
+
+/* Contenus texte hp-industries (colonne gauche) :
+   on utilise .is-active pour contrôler l'opacité / le z-index via JS */
+.hp-industries_left-col .hp-industries_txt-content {
+  opacity: 0;
+  transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hp-industries_left-col .hp-industries_txt-content.is-active {
+  opacity: 1;
+  z-index: 4 !important; /* supérieur aux is-zindex1/2/3 définis côté Webflow */
+}

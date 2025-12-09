@@ -1,0 +1,126 @@
+/* -----------------tablet & mobile-------------- */
+@media screen and (max-width: 991px) {
+  .navbar_menu {
+    overflow: hidden; /* on confine le scroll à l’intérieur */
+    max-height: calc(100vh - 4.5rem);
+  }
+  .navbar_menu-center {
+    height: 100%;
+    overflow-y: auto;
+  }
+
+  /* Le dropdown est remis dans le flux pour occuper la hauteur de navbar_menu-center */
+  .navbar_dropdown-list {
+    position: static; /* override du position:absolute Webflow sur mobile */
+    max-height: none;
+    overflow-y: visible; /* ou auto si tu veux un scroll interne au bloc */
+  }
+
+  .navbar_menu.dropdown-open {
+    padding: 0rem;
+  }
+
+  .navbar_mobile-back-txt.is-focus {
+    display: block;
+  }
+
+  .navbar_dropdown-toggle.is-focus {
+    padding-top: var(--_responsive---margin--padding--spacer--gap--xlarge);
+    padding-right: var(--size--1-25rem);
+    padding-bottom: var(--_responsive---margin--padding--spacer--gap--xlarge);
+    padding-left: var(--size--1-25rem);
+  }
+
+  .navbar_link-column.is-focus {
+    padding-right: var(--size--1-25rem);
+    padding-left: var(--size--1-25rem);
+  }
+}
+/* -----------------desktop-------------- */
+@media screen and (min-width: 992px) {
+  /* Smooth slide for fixed navbar when hiding on scroll */
+  .navbar_component {
+    transition:
+      transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+      color 0.2s ease-out,
+      background-color 0.2s ease-out;
+  }
+
+  /* Hover navbar_component : change color lines menu burger */
+  /*.navbar_component:hover .menu-icon1_line-top,
+  .navbar_component:hover .menu-icon1_line-middle,
+  .navbar_component:hover .button_svg-wrapper.is-left{
+    background-color: var(--_brand---surface-bg--contrast);
+  }*/
+  .navbar_logo-link.is-hover {
+    color: var(--_brand---text--interaction);
+  }
+  /* Hover navbar_component : change background color button CTA */
+  .navbar_component:hover .button.is-yellow-gradient {
+    background: var(--_brand---surface-fill--interaction);
+    color: var(--_button-style---active--text);
+  }
+
+  /* Hover navbar component : change color SVG button CTA */
+  .navbar_component:hover .button_svg-wrapper.is-right,
+  .navbar_component:hover .button_svg-wrapper.is-left {
+    color: var(--_brand---text--brand);
+  }
+
+  /* Initial state SVG button CTA (slow transition) */
+  .button.is-yellow-gradient .button_svg-wrapper.is-left,
+  .button.is-yellow-gradient .button_svg-wrapper.is-right {
+    transition:
+      opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .button.is-yellow-gradient .button_svg-wrapper.is-left {
+    transform: translateX(-6px);
+  }
+
+  .button.is-yellow-gradient .button_svg-wrapper.is-right {
+    transform: translateX(0);
+  }
+
+  /* Hover button CTA - show left icon */
+  .button.is-yellow-gradient:hover .button_svg-wrapper.is-left {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  /* hide right icon */
+  .button.is-yellow-gradient:hover .button_svg-wrapper.is-right {
+    opacity: 0;
+    transform: translateX(6px);
+  }
+  /* Icon .navbar_link-block  - initial state */
+  .icon-1x1-small.is-hide-by-default {
+    width: 0px;
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+  }
+  /* Hover .navbar_link-block - show icon */
+  .navbar_link-block:hover .icon-1x1-small.is-hide-by-default {
+    width: var(--_responsive---icon--small);
+    opacity: 1;
+  }
+  /* Hover .navbar_case: show icon */
+  .navbar_case:hover .icon-1x1-small.is-hide-by-default {
+    width: var(--_responsive---icon--small);
+    opacity: 1;
+  }
+
+  /* Initial state .navbar_btm-line */
+  .navbar_btm-line {
+    width: 100%;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Visible state .navbar_btm-line */
+  .navbar_btm-line.is-visible {
+    transform: scaleX(1);
+  }
+}

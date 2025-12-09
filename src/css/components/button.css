@@ -1,0 +1,48 @@
+/* -----------------button is-white-------------- */
+/* Base state */
+.button.is-white {
+  background-image: linear-gradient(
+    to right,
+    var(--_brand---surface-bg--contrast),
+    var(--_brand---surface-bg--contrast)
+  );
+  background-size: 0% 100%;
+  background-position: left top;
+  background-repeat: no-repeat;
+  transition: background-size 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.button.is-white:hover {
+  background-size: 100% 100%;
+  color: var(--_button-style---active--text);
+}
+
+.button.is-white .button_svg-wrapper.is-left,
+.button.is-white .button_svg-wrapper.is-right,
+.button.is-tertiary .button_svg-wrapper.is-right,
+.button.is-tertiary .button_svg-wrapper.is-left {
+  transition:
+    opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.button.is-white .button_svg-wrapper.is-left,
+.button.is-tertiary .button_svg-wrapper.is-left {
+  transform: translateX(-6px);
+}
+
+.button.is-white .button_svg-wrapper.is-right,
+.button.is-tertiary .button_svg-wrapper.is-right {
+  transform: translateX(0);
+}
+
+.button.is-white:hover .button_svg-wrapper.is-right,
+.button.is-tertiary:hover .button_svg-wrapper.is-right {
+  opacity: 0;
+  transform: translateX(6px);
+}
+.button.is-white:hover .button_svg-wrapper.is-left,
+.button.is-tertiary:hover .button_svg-wrapper.is-left {
+  opacity: 1;
+  transform: translateX(0);
+}

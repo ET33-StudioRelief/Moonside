@@ -1,0 +1,32 @@
+/* ----------------- swiper HP Testimonial - desktop-------------- */
+.swiper.is-hp-testimonial {
+  overflow: hidden;
+}
+
+.swiper.is-hp-testimonial .swiper-wrapper {
+  display: flex;
+}
+
+.swiper.is-hp-testimonial .swiper-slide {
+  flex: 0 0 50%; /* 2 slides visibles par viewport */
+  box-sizing: border-box;
+}
+
+@media screen and (max-width: 1250px) {
+  .swiper.is-hp-testimonial .swiper-slide {
+    flex: 0 0 100%; /* 1 slide visible par viewport */
+  }
+}
+
+/* Pagination custom */
+.swiper-pagination.is-hp-testimonial .swiper-pagination-bullet {
+  width: 0.5rem;
+  height: 0.5rem;
+  background-color: var(--surface-fill-interaction, #061c2d);
+  opacity: 0.2;
+  border-radius: var(--radius--round);
+}
+
+.swiper-pagination.is-hp-testimonial .swiper-pagination-bullet-active {
+  opacity: 1;
+}
