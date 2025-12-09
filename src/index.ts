@@ -1,5 +1,6 @@
 import './index.css';
 
+import { initHubFilters } from './typescript/components/filters';
 import {
   initContactModal,
   initContactModalSuccessLayout,
@@ -43,4 +44,5 @@ window.Webflow.push(() => {
   initHideFirstOptionSelects();
   initContactModalSuccessLayout();
   initServicesSlider();
+  initHubFilters();
 });

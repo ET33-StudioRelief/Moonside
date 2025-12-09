@@ -12,7 +12,7 @@ export function initCaseSvgMorph(): void {
     return;
   }
 
-  const cards = document.querySelectorAll('.case_card-img-wrap') as NodeListOf<HTMLElement>;
+  const cards = document.querySelectorAll('.cc--case_card') as NodeListOf<HTMLElement>;
   if (!cards.length) return;
 
   cards.forEach((card) => {

@@ -65,7 +65,7 @@
 }
 
 /* Bouton de case : affichage au hover de l'image */
-.case_card-img-wrap:hover [data-button='case-card'] {
+.cc--case_card:hover [data-button='case-card'] {
   opacity: 1;
   pointer-events: auto;
 }
