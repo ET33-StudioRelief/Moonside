@@ -19,6 +19,13 @@ export function initCaseSvgMorph(): void {
     const svg = card.querySelector('svg[data-morph="case-card"]') as SVGSVGElement | null;
     if (!svg) return;
 
+    // Responsive: ensure the SVG fills its wrapper (avoid letterboxing on non-square containers)
+    // "slice" fills the box while preserving aspect ratio (may crop slightly).
+    svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+    svg.style.width = '100%';
+    svg.style.height = '100%';
+    svg.style.display = 'block';
+
     const defaultPath = svg.querySelector(
       '[data-morph="case-card-default"]'
     ) as SVGPathElement | null;
@@ -95,15 +102,76 @@ export function initHeroPathGlow(): void {
 
   const wrapper = hero.querySelector('.hero_decorative-wrapper') as HTMLElement | null;
   const svg = wrapper?.querySelector('svg') as SVGSVGElement | null;
-  const path = svg?.querySelector('path') as SVGPathElement | null;
+  const paths = svg ? (Array.from(svg.querySelectorAll('path')) as SVGPathElement[]) : [];
 
-  if (!wrapper || !svg || !path) {
+  if (!wrapper || !svg || paths.length === 0) {
     return;
   }
 
-  const glow = document.createElement('div');
-  glow.className = 'hero_glow-follow';
-  glow.innerHTML = `
+  // Pick the longest path (more robust if the embed contains multiple paths)
+  let path: SVGPathElement | null = null;
+  let maxLen = -1;
+  paths.forEach((p) => {
+    try {
+      const len = p.getTotalLength();
+      if (len > maxLen) {
+        maxLen = len;
+        path = p;
+      }
+    } catch {
+      // ignore invalid paths
+    }
+  });
+  if (!path) return;
+
+  // The Webflow "path" here is often a filled shape that doubles back on itself.
+  // To avoid the glow doing a loop/return (your step 3), we only animate on the
+  // visible segment: from the top-left-most point to the bottom-right-most point.
+  const total = maxLen;
+  const samples = 500;
+  let startLen = 0;
+  let endLen = total;
+  let bestStartScore = Number.POSITIVE_INFINITY;
+  let bestEndScore = Number.NEGATIVE_INFINITY;
+
+  for (let i = 0; i <= samples; i += 1) {
+    const l = (total * i) / samples;
+    const pt = (path as unknown as SVGGeometryElement).getPointAtLength(l);
+    const startScore = pt.y * 100000 + pt.x; // top-left preference
+    if (startScore < bestStartScore) {
+      bestStartScore = startScore;
+      startLen = l;
+    }
+    const endScore = pt.y * 100000 + pt.x; // bottom-right preference
+    if (endScore > bestEndScore) {
+      bestEndScore = endScore;
+      endLen = l;
+    }
+  }
+
+  const startProgress = startLen / total;
+  const endProgress = endLen / total;
+  // Ensure a valid forward segment (avoid start/end being reversed or identical)
+  let mpStart = Number.isFinite(startProgress) ? startProgress : 0;
+  let mpEnd = Number.isFinite(endProgress) ? endProgress : 1;
+  if (mpEnd < mpStart) {
+    [mpStart, mpEnd] = [mpEnd, mpStart];
+  }
+  // Clamp to [0..1]
+  mpStart = Math.min(1, Math.max(0, mpStart));
+  mpEnd = Math.min(1, Math.max(0, mpEnd));
+  // Fallback if sampling produced a degenerate segment
+  if (Math.abs(mpEnd - mpStart) < 0.001) {
+    mpStart = 0;
+    mpEnd = 1;
+  }
+
+  // Reuse the same glow node (avoid duplicates on re-init)
+  let glow = wrapper.querySelector('.hero_glow-follow') as HTMLElement | null;
+  if (!glow) {
+    glow = document.createElement('div');
+    glow.className = 'hero_glow-follow';
+    glow.innerHTML = `
     <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="none">
       <g filter="url(#filter0_f_2213_2581)">
         <circle cx="18" cy="18" r="10" fill="url(#paint0_radial_2213_2581)"/>
@@ -121,23 +189,35 @@ export function initHeroPathGlow(): void {
       </defs>
     </svg>
   `;
-  wrapper.appendChild(glow);
+    wrapper.appendChild(glow);
+  }
+
+  // Ensure we don't stack multiple tweens/ScrollTriggers controlling the same element
+  const triggerId = 'hero-path-glow-follow';
+  ScrollTrigger.getById(triggerId)?.kill();
+  gsap.killTweensOf(glow);
 
   // Motion le long du path, synchronisé avec le scroll
   gsap.to(glow, {
     ease: 'none',
     scrollTrigger: {
+      id: triggerId,
       trigger: hero,
-      start: 'top center',
-      end: 'bottom center',
+      // Start when the hero hits the top of the viewport
+      start: 'top top',
+      // Stop earlier than the hero leaving the viewport (tweak this to match your "step 2").
+      // Using "bottom bottom" can produce a 0-length trigger on a 100vh hero.
+      end: 'bottom 40%',
       scrub: true,
+      invalidateOnRefresh: true,
     },
     motionPath: {
       path,
       align: path,
       alignOrigin: [0.5, 0.5],
-      start: 1.6,
-      end: 0.3,
+      // Reverse direction
+      start: mpEnd,
+      end: mpStart,
     },
   });
 }

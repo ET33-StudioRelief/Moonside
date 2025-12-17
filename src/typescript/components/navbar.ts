@@ -306,7 +306,9 @@ function initMobileDropdownLayoutEffects(): void {
     '.navbar_dropdown-toggle'
   ) as NodeListOf<HTMLElement>;
   const navbarBtnWrap = document.querySelector('.navbar_btn-wrap') as HTMLElement | null;
-  const mobileBackTxt = document.querySelector('.navbar_mobile-back-txt') as HTMLElement | null;
+  const mobileBackTxtEls = document.querySelectorAll(
+    '.navbar_mobile-back-txt'
+  ) as NodeListOf<HTMLElement>;
 
   if (!navbarMenu || dropdownToggles.length === 0) {
     return;
@@ -326,9 +328,8 @@ function initMobileDropdownLayoutEffects(): void {
     if (navbarBtnWrap) {
       navbarBtnWrap.style.display = '';
     }
-    if (mobileBackTxt) {
-      mobileBackTxt.classList.remove('is-focus');
-    }
+    // Chaque dropdown a son propre "go back" : on reset tout le monde.
+    mobileBackTxtEls.forEach((el) => el.classList.remove('is-focus'));
   };
 
   const applyLayoutForToggle = (toggle: HTMLElement) => {
@@ -375,9 +376,8 @@ function initMobileDropdownLayoutEffects(): void {
     }
 
     // Focus sur le texte de retour mobile
-    if (mobileBackTxt) {
-      mobileBackTxt.classList.add('is-focus');
-    }
+    const mobileBackTxt = toggle.querySelector('.navbar_mobile-back-txt') as HTMLElement | null;
+    if (mobileBackTxt) mobileBackTxt.classList.add('is-focus');
   };
 
   // Utiliser un MutationObserver sur aria-expanded pour suivre l'ouverture/fermeture,

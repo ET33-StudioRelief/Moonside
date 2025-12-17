@@ -1,4 +1,4 @@
-/* -----------------button is-white-------------- */
+/* -----------------button ------------- */
 .button .button_svg-wrapper.is-left,
 .button .button_svg-wrapper.is-right {
   transition:
@@ -36,4 +36,43 @@
 
 .button:hover .button_svg-wrapper.is-left.is-hide-by-default {
   width: var(--size--0-75rem, 0.75rem);
+}
+
+/* -----------------button is-white (circular fill)-------------- */
+/* Circular fill that expands from the left to the right on hover (like services_arrow). */
+.button.is-white {
+  position: relative;
+  overflow: hidden;
+  /* keep content above the fill */
+  transition: color 200ms ease-out;
+}
+
+.button.is-white::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  /* Large circle so it covers the whole button as it expands from the left */
+  width: 300%;
+  height: 0;
+  padding-top: 300%; /* keep a square box -> true circle with border-radius */
+  border-radius: 50%;
+  background-color: var(--_brand---surface-bg--contrast);
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 0;
+}
+
+.button.is-white > * {
+  position: relative;
+  z-index: 1;
+}
+
+.button.is-white:hover::before {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Text color needs to be set on the button (not on ::before) */
+.button.is-white:hover {
+  color: var(--_brand---text--invert-primary);
 }

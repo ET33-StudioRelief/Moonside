@@ -73,11 +73,12 @@
     z-index: 1;
   }
 
-  .services_arrow:hover {
+  /* Trigger the arrow hover state when hovering the whole services item */
+  .services_item:hover .services_arrow {
     color: var(--_brand---text--invert-primary);
   }
 
-  .services_arrow:hover::before {
+  .services_item:hover .services_arrow::before {
     transform: translate(-50%, -50%) scale(1);
   }
 }
