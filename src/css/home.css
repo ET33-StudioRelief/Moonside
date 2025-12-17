@@ -13,17 +13,78 @@
   height: 100%;
   display: block;
 }
-/* -----------------section services-------------- */
-.services_nav-item:hover .icon-1x1-small.is-hide-by-default {
-  width: var(--_responsive---icon--small);
-  opacity: 1;
+
+/* -----------------section promises-------------- */
+@media screen and (min-width: 1700px) {
+  .promises_lottie-wrap {
+    right: 5%;
+  }
+}
+@media screen and (min-width: 2000px) {
+  .promises_lottie-wrap {
+    right: 10%;
+  }
 }
 
-/* Fade entre les blocs .services_flex */
+/* Active state only on desktop (> 991px) */
+@media screen and (min-width: 992px) {
+  .services_nav-item.is-active {
+    color: var(--_brand---text--invert-primary);
+    background-color: var(--_brand---surface-fill--interaction);
+  }
+
+  /* Keep the active colors even on hover (override Webflow hover background). */
+  .services_nav-item.is-active:hover {
+    color: var(--_brand---text--invert-primary);
+    background-color: var(--_brand---surface-fill--interaction);
+  }
+
+  /* Optional: show the dot icon when the item is active too (same as hover). */
+  .services_nav-item.is-active .icon-1x1-small.is-hide-by-default {
+    width: var(--_responsive---icon--small);
+    opacity: 1;
+  }
+  /* -----------------section services-------------- */
+  .services_nav-item:hover .icon-1x1-small.is-hide-by-default {
+    width: var(--_responsive---icon--small);
+    opacity: 1;
+  }
+
+  /* Hover fill (circular) for the services arrow */
+
+  .services_arrow::before {
+    content: '';
+    position: absolute;
+    /* Anchor the circle's center to the bottom-left corner */
+    top: 100%;
+    left: 0;
+    /* Bigger circle so it fully covers the element from the bottom-left origin */
+    width: 250%;
+    height: 250%;
+    border-radius: 50%;
+    background-color: var(--_brand---surface-fill--interaction);
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 0;
+  }
+
+  .services_arrow > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .services_arrow:hover {
+    color: var(--_brand---text--invert-primary);
+  }
+
+  .services_arrow:hover::before {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
 .services_flex {
   transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
-/*ANIMATION SECTION SERVICES*/
+
 /* Initial state services_txt-content */
 .services_txt-content {
   overflow: hidden;
@@ -54,6 +115,10 @@
 }
 
 .services_title:hover .services_btm-line {
+  transform: scaleX(1);
+}
+
+.location_dropdown:hover .services_btm-line {
   transform: scaleX(1);
 }
 

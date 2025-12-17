@@ -141,3 +141,99 @@ export function initHeroPathGlow(): void {
     },
   });
 }
+
+/**
+ * Animation scrollée pour le bloc #yellow-radius-gradient :
+ * - liée au scroll (scrub)
+ * - mouvement vers le haut et scale plus prononcé
+ */
+export function initYellowRadiusGradient(): void {
+  const el = document.getElementById('yellow-radius-gradient') as HTMLElement | null;
+  if (!el) return;
+
+  gsap.fromTo(
+    el,
+    {
+      y: 160,
+      scale: 0.7,
+    },
+    {
+      y: 0,
+      scale: 1.06,
+      ease: 'power3.out',
+      scrollTrigger: {
+        trigger: el,
+        start: 'top 75%',
+        end: 'top 10%',
+        scrub: true,
+      },
+    }
+  );
+}
+
+/**
+ * Accordéon pour les cartes équipe :
+ * - clic sur .team_card-svg-wrap (icône dans la carte)
+ * - .team_card-overlay : opacity 0 -> 1
+ * - .team_card-description-wrap : height 0 -> auto, opacity 0 -> 1
+ * - .team_card-more-logo caché, .team_card-less-logo affiché
+ */
+export function initTeamCardToggle(): void {
+  const triggers = document.querySelectorAll<HTMLElement>('.team_card-svg-wrap');
+  if (!triggers.length) return;
+
+  triggers.forEach((trigger) => {
+    const card = trigger.closest('.team_card') as HTMLElement | null;
+    if (!card) return;
+
+    const overlay = card.querySelector('.team_card-overlay') as HTMLElement | null;
+    const description = card.querySelector('.team_card-description-wrap') as HTMLElement | null;
+    const moreLogo = card.querySelector('.team_card-more-logo') as HTMLElement | null;
+    const lessLogo = card.querySelector('.team_card-less-logo') as HTMLElement | null;
+
+    if (!overlay || !description || !moreLogo || !lessLogo) return;
+
+    const tl = gsap.timeline({ paused: true });
+
+    tl.to(
+      overlay,
+      {
+        opacity: 1,
+        duration: 0.3,
+        ease: 'power2.out',
+      },
+      0
+    ).to(
+      description,
+      {
+        height: 'auto',
+        opacity: 1,
+        duration: 0.35,
+        ease: 'power2.out',
+      },
+      0
+    );
+
+    tl.eventCallback('onStart', () => {
+      moreLogo.style.display = 'none';
+      lessLogo.style.display = 'block';
+    });
+
+    tl.eventCallback('onReverseComplete', () => {
+      moreLogo.style.display = '';
+      lessLogo.style.display = 'none';
+    });
+
+    let isOpen = false;
+
+    trigger.addEventListener('click', () => {
+      if (!isOpen) {
+        tl.play();
+        isOpen = true;
+      } else {
+        tl.reverse();
+        isOpen = false;
+      }
+    });
+  });
+}

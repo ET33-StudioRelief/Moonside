@@ -1,5 +1,6 @@
 import './index.css';
 
+import { initAboutInteractions } from './typescript/about';
 import { initHubFilters } from './typescript/components/filters';
 import {
   initContactModal,
@@ -8,7 +9,7 @@ import {
   initHideFirstOptionSelects,
 } from './typescript/components/modal';
 import { initNavbarDropdownEffects, initNavbarHoverEffects } from './typescript/components/navbar';
-import { svgComponent } from './typescript/global';
+import { initSectionRevealOnScroll, svgComponent } from './typescript/global';
 import {
   initIndustriesToggle,
   initServicesFlexSwitcher,
@@ -18,6 +19,8 @@ import {
   initAdvantagesScrollFollow,
   initCaseSvgMorph,
   initHeroPathGlow,
+  initTeamCardToggle,
+  initYellowRadiusGradient,
 } from './typescript/utils/gsap';
 import {
   initHpCaseSwiperMobile,
@@ -28,14 +31,18 @@ import {
 window.Webflow ||= [];
 window.Webflow.push(() => {
   svgComponent();
+  initSectionRevealOnScroll();
   initNavbarHoverEffects();
   initNavbarDropdownEffects();
   initServicesToggle();
   initServicesFlexSwitcher();
   initIndustriesToggle();
+  initAboutInteractions();
   initCaseSvgMorph();
   initAdvantagesScrollFollow();
   initHeroPathGlow();
+  initYellowRadiusGradient();
+  initTeamCardToggle();
   initHpTestimonialSwiper();
   initHpCaseSwiperMobile();
   initHpIndustriesSlider();
