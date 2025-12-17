@@ -1,0 +1,60 @@
+/* -----------------animations globales-------------- */
+@keyframes section-reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes section-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Utilitaires à appliquer sur les sections à animer */
+.section-reveal-up,
+[section-animation='reveal-up'],
+[data-animation='reveal-up'] {
+  opacity: 0;
+  transform: translateY(1.5rem);
+  animation: section-reveal-up 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Variante déclenchée au scroll : section-animation="reveal-up-scroll" ou data-animation="reveal-up-scroll" */
+[section-animation='reveal-up-scroll'],
+[data-animation='reveal-up-scroll'] {
+  opacity: 0;
+  transform: translateY(1.5rem);
+}
+
+[section-animation='reveal-up-scroll'].is-revealed,
+[data-animation='reveal-up-scroll'].is-revealed {
+  animation: section-reveal-up 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Variante fade-only (sans move up) */
+[section-animation='fade-in'],
+[data-animation='fade-in'] {
+  opacity: 0;
+  animation: section-fade-in 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+[section-animation='fade-in-scroll'],
+[data-animation='fade-in-scroll'] {
+  opacity: 0;
+}
+
+[section-animation='fade-in-scroll'].is-revealed,
+[data-animation='fade-in-scroll'].is-revealed {
+  animation: section-fade-in 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}

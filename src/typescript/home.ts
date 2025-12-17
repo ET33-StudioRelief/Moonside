@@ -107,6 +107,16 @@ export function initServicesFlexSwitcher(): void {
 
     activeKey = key;
 
+    // Met à jour l'état actif des nav-items
+    navItems.forEach((item) => {
+      const itemKey = item.getAttribute('data-services');
+      if (itemKey === key) {
+        item.classList.add('is-active');
+      } else {
+        item.classList.remove('is-active');
+      }
+    });
+
     // Met à jour l'état visuel (opacity / z-index / pointer-events)
     flexByKey.forEach((block, k) => {
       if (k === key) {

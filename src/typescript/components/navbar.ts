@@ -71,6 +71,40 @@ function initNavbarScrollHide(): void {
   let lastScrollY = window.scrollY;
   let isHidden = false;
 
+  const applyNavbarVisualState = (currentY: number) => {
+    // Gestion du background + couleur + état du logo en fonction de la position
+    // par rapport à .section_hero (si elle existe).
+    if (heroSection) {
+      const heroBottom = heroSection.offsetTop + heroSection.offsetHeight;
+      const navbarHeight = navbar.offsetHeight || 0;
+
+      // Si le haut de la fenêtre + navbar est en dessous du bas du hero
+      // → on applique le fond + couleur de texte + logo hover.
+      if (currentY + navbarHeight >= heroBottom) {
+        navbar.style.backgroundColor = 'var(--_brand---surface-fill--primary)';
+        navbar.style.color = 'var(--_brand---text--primary)';
+        if (navbarLogoLink) {
+          navbarLogoLink.classList.add('is-hover');
+        }
+      } else {
+        // Au-dessus / sur le hero : on laisse le style d'origine (transparent),
+        // et on retire is-hover (l'effet hover souris peut le remettre).
+        navbar.style.backgroundColor = '';
+        navbar.style.color = '';
+        if (navbarLogoLink) {
+          navbarLogoLink.classList.remove('is-hover');
+        }
+      }
+    } else {
+      // Pas de section_hero trouvée : on applique toujours le fond + couleur de texte + logo hover
+      navbar.style.backgroundColor = 'var(--_brand---surface-fill--primary)';
+      navbar.style.color = 'var(--_brand---text--primary)';
+      if (navbarLogoLink) {
+        navbarLogoLink.classList.add('is-hover');
+      }
+    }
+  };
+
   const onScroll = () => {
     const currentY = window.scrollY;
     const delta = currentY - lastScrollY;
@@ -97,40 +131,16 @@ function initNavbarScrollHide(): void {
         isHidden = false;
       }
 
-      // Gestion du background en fonction de la position par rapport à .section_hero
-      if (heroSection) {
-        const heroBottom = heroSection.offsetTop + heroSection.offsetHeight;
-        const navbarHeight = navbar.offsetHeight || 0;
-
-        // Si le haut de la fenêtre plus la navbar est en-dessous du bas du hero
-        // → on applique le fond + couleur de texte. Sinon on laisse le style d'origine.
-        if (currentY + navbarHeight >= heroBottom) {
-          navbar.style.backgroundColor = 'var(--_brand---surface-fill--primary)';
-          navbar.style.color = 'var(--_brand---text--primary)';
-          if (navbarLogoLink) {
-            navbarLogoLink.classList.add('is-hover');
-          }
-        } else {
-          navbar.style.backgroundColor = '';
-          navbar.style.color = '';
-          if (navbarLogoLink) {
-            navbarLogoLink.classList.remove('is-hover');
-          }
-        }
-      } else {
-        // Pas de section_hero trouvée : on applique toujours le fond + couleur de texte
-        navbar.style.backgroundColor = 'var(--_brand---surface-fill--primary)';
-        navbar.style.color = 'var(--_brand---text--primary)';
-        if (navbarLogoLink) {
-          navbarLogoLink.classList.add('is-hover');
-        }
-      }
+      applyNavbarVisualState(currentY);
     }
 
     lastScrollY = currentY;
   };
 
   window.addEventListener('scroll', onScroll, { passive: true });
+
+  // Appliquer l'état initial au chargement (ex: refresh déjà "en dessous" du hero)
+  applyNavbarVisualState(window.scrollY);
 }
 
 /**

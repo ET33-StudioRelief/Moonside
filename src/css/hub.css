@@ -4,13 +4,25 @@
     margin-top: 3rem;
   }
 }
+
 /* Mobile : 1 colonne (< 768px) — on neutralise le décalage */
 @media screen and (max-width: 767px) {
   .cases_cards-wrap > *:nth-child(2n) {
     margin-top: 0;
   }
 }
+
 /* Forms - radios (Webflow) */
 .w-checkbox-input {
   box-shadow: none !important;
+}
+
+/* Compteurs de filtres (services / industries / countries) */
+.cases_number-filter {
+  transition: opacity 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.cases_number-filter.is-visible {
+  opacity: 1;
+  pointer-events: auto;
 }
