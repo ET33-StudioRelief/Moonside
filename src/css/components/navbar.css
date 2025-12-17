@@ -29,6 +29,7 @@
     padding-right: var(--size--1-25rem);
     padding-bottom: var(--_responsive---margin--padding--spacer--gap--xlarge);
     padding-left: var(--size--1-25rem);
+    background-color: var(--_brand---surface-bg--secondary);
   }
 
   .navbar_link-column.is-focus {

@@ -8,12 +8,6 @@ export function svgComponent(): void {
   });
 }
 
-/**
- * Révèle les sections au scroll pour les éléments marqués avec
- * section-animation="reveal-up-scroll" / "fade-in-scroll"
- * ou data-animation="reveal-up-scroll" / "fade-in-scroll".
- * Ajoute la classe .is-revealed lorsque l'élément entre dans le viewport.
- */
 export function initSectionRevealOnScroll(): void {
   if (typeof document === 'undefined') return;
   if (typeof window === 'undefined' || !('IntersectionObserver' in window)) return;

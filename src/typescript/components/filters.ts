@@ -56,6 +56,12 @@ function updateHubFilterUI(): void {
     const value = counts[key];
     // Si aucun filtre pour ce groupe, on laisse vide plutôt que "0"
     el.textContent = value > 0 ? String(value) : '';
+    // Webflow may set opacity: 0 on these counters; toggle a class to force visibility.
+    if (value > 0) {
+      el.classList.add('is-visible');
+    } else {
+      el.classList.remove('is-visible');
+    }
   });
 }
 

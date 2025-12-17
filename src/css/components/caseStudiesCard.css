@@ -1,0 +1,22 @@
+/* Case card SVG overlay: ensure the morph SVG always fills its parent */
+.case_card-svg-wrapper .w-embed,
+.case_card-svg-wrapper svg[data-morph='case-card'] {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/*services list in case card*/
+.case_card-service .w-dyn-items,
+.case_card-service .w-dyn-item,
+.case_card-service [fs-list-field='services'] {
+  display: inline;
+}
+
+.case_card-service [fs-list-field='services'] {
+  margin: 0;
+}
+
+.case_card-service .w-dyn-item:not(:last-child) [fs-list-field='services']::after {
+  content: ', ';
+}
