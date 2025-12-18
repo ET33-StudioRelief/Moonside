@@ -26,3 +26,10 @@
   opacity: 1;
   pointer-events: auto;
 }
+
+/* Hide left margin column on mid-size screens (992px–1300px) */
+@media screen and (min-width: 992px) and (max-width: 1300px) {
+  .cases_left-margin {
+    display: none;
+  }
+}

@@ -90,10 +90,21 @@ export function initAdvantagesScrollFollow(): void {
 }
 
 /**
- * Hero path glow: WIP
+ * Hero path glow
  */
-export function initHeroPathGlow(): void {
-  const hero = document.querySelector('.section_hero') as HTMLElement | null;
+export function initHeroPathGlow(requiredTrigger?: string): void {
+  const escapeAttr = (value: string) => {
+    const cssObj = (window as unknown as { CSS?: { escape?: (v: string) => string } }).CSS;
+    if (typeof cssObj?.escape === 'function') return cssObj.escape(value);
+    // Minimal fallback: escape quotes/backslashes for attribute selector usage.
+    return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  };
+
+  const selector = requiredTrigger
+    ? `.section_hero[trigger="${escapeAttr(requiredTrigger)}"]`
+    : '.section_hero';
+
+  const hero = document.querySelector(selector) as HTMLElement | null;
   if (!hero) return;
 
   const wrapper = hero.querySelector('.hero_decorative-wrapper') as HTMLElement | null;
@@ -219,10 +230,311 @@ export function initHeroPathGlow(): void {
 }
 
 /**
- * Animation scrollée pour le bloc #yellow-radius-gradient :
- * - liée au scroll (scrub)
- * - mouvement vers le haut et scale plus prononcé
+ * Hero multi-path glow
+ * Use-case: heroes like `trigger="hero-services"` where the SVG contains multiple <path>.
+ * Requirement: one glow per path, each traversing 0% -> 100% of its path (no segment sampling).
  */
+export function initHeroMultiPathGlow(requiredTrigger: string): void {
+  if (typeof document === 'undefined') return;
+
+  const escapeAttr = (value: string) => {
+    const cssObj = (window as unknown as { CSS?: { escape?: (v: string) => string } }).CSS;
+    if (typeof cssObj?.escape === 'function') return cssObj.escape(value);
+    return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  };
+
+  const hero = document.querySelector(
+    `.section_hero[trigger="${escapeAttr(requiredTrigger)}"]`
+  ) as HTMLElement | null;
+  if (!hero) return;
+
+  // Intentionally hardcoded to keep this function minimal.
+  const stStart = 'top top';
+  const stEnd = 'bottom 60%';
+
+  // Prefer the same wrapper as the home hero; fallback to hero itself if structure differs.
+  const wrapper =
+    (hero.querySelector('.hero_decorative-wrapper') as HTMLElement | null) ?? (hero as HTMLElement);
+  const svg = wrapper.querySelector('svg') as SVGSVGElement | null;
+  if (!svg) return;
+
+  const paths = Array.from(svg.querySelectorAll('path')) as SVGPathElement[];
+  if (!paths.length) return;
+
+  const glowMarkup = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <g filter="url(#filter0_f_2213_2581)">
+        <circle cx="18" cy="18" r="10" fill="url(#paint0_radial_2213_2581)"/>
+      </g>
+      <defs>
+        <filter id="filter0_f_2213_2581" x="0" y="0" width="36" height="36" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+          <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+          <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+          <feGaussianBlur stdDeviation="4" result="effect1_foregroundBlur_2213_2581"/>
+        </filter>
+        <radialGradient id="paint0_radial_2213_2581" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(18 18) rotate(90) scale(10)">
+          <stop stop-color="white"/>
+          <stop offset="1" stop-color="#FFE8B2"/>
+        </radialGradient>
+      </defs>
+    </svg>
+  `;
+
+  paths.forEach((path, i) => {
+    // Skip invalid paths defensively
+    try {
+      if (path.getTotalLength() <= 0) return;
+    } catch {
+      return;
+    }
+
+    const triggerId = `hero-multi-path-glow:${requiredTrigger}:${i}`;
+    ScrollTrigger.getById(triggerId)?.kill();
+
+    let glow = wrapper.querySelector(
+      `.hero_glow-follow[data-hero-glow-path="${i}"]`
+    ) as HTMLElement | null;
+    if (!glow) {
+      glow = document.createElement('div');
+      glow.className = 'hero_glow-follow';
+      glow.setAttribute('data-hero-glow-path', String(i));
+      glow.innerHTML = glowMarkup;
+      wrapper.appendChild(glow);
+    }
+
+    gsap.killTweensOf(glow);
+
+    gsap.to(glow, {
+      ease: 'none',
+      scrollTrigger: {
+        id: triggerId,
+        trigger: hero,
+        start: stStart,
+        end: stEnd,
+        scrub: true,
+        invalidateOnRefresh: true,
+      },
+      motionPath: {
+        path,
+        align: path,
+        alignOrigin: [0.5, 0.5],
+        start: 0,
+        end: 1,
+      },
+    });
+  });
+}
+
+/**
+ * Hero industry: multi-path "dot" glow (radial gradient)
+ * Requirement: for each path in the embed, create 2 dots (one at each end) that travel toward the center.
+ *
+ * This is intentionally simpler than `initHeroPathGlow`:
+ * - no visible-segment sampling
+ * - 2 dots per path
+ *
+ * Optional per-hero overrides on the section:
+ * - data-hero-glow-start / data-hero-glow-end (ScrollTrigger)
+ */
+export function initHeroIndustryGlow(requiredTrigger = 'hero-industry'): void {
+  if (typeof document === 'undefined') return;
+
+  const escapeAttr = (value: string) => {
+    const cssObj = (window as unknown as { CSS?: { escape?: (v: string) => string } }).CSS;
+    if (typeof cssObj?.escape === 'function') return cssObj.escape(value);
+    return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  };
+
+  const hero = document.querySelector(
+    `.section_hero[trigger="${escapeAttr(requiredTrigger)}"]`
+  ) as HTMLElement | null;
+  if (!hero) return;
+
+  // Intentionally hardcoded to keep this function minimal.
+  const stStart = 'top top';
+  const stEnd = 'bottom 60%';
+
+  const wrapper =
+    (hero.querySelector('.hero_decorative-wrapper') as HTMLElement | null) ?? (hero as HTMLElement);
+  const svg = wrapper.querySelector('svg') as SVGSVGElement | null;
+  if (!svg) return;
+
+  // Only "path" as requested (your embed also contains ellipses/circles; we ignore them here).
+  const paths = Array.from(svg.querySelectorAll('path')) as SVGPathElement[];
+  if (!paths.length) return;
+
+  // Target point where the 2 dots should meet.
+  // Default: the circle that uses `fill="url(#paint0_radial_2519_2305)"` in your embed.
+  const targetGradientId =
+    (hero.getAttribute('data-hero-industry-target-gradient') || '').trim() ||
+    'paint0_radial_2519_2305';
+  const targetEl =
+    (svg.querySelector(`[fill="url(#${targetGradientId})"]`) as SVGGraphicsElement | null) ?? null;
+  const getTargetPoint = (): DOMPoint | null => {
+    // Allow explicit override if needed
+    const cxRaw = (hero.getAttribute('data-hero-industry-target-cx') || '').trim();
+    const cyRaw = (hero.getAttribute('data-hero-industry-target-cy') || '').trim();
+    if (cxRaw && cyRaw) {
+      const cx = Number.parseFloat(cxRaw);
+      const cy = Number.parseFloat(cyRaw);
+      if (Number.isFinite(cx) && Number.isFinite(cy)) return new DOMPoint(cx, cy);
+    }
+
+    if (!targetEl) return null;
+
+    // Most of the time it's a <circle> with cx/cy
+    const cx = Number.parseFloat(
+      (targetEl as unknown as SVGCircleElement).getAttribute('cx') || ''
+    );
+    const cy = Number.parseFloat(
+      (targetEl as unknown as SVGCircleElement).getAttribute('cy') || ''
+    );
+    if (Number.isFinite(cx) && Number.isFinite(cy)) return new DOMPoint(cx, cy);
+
+    // Fallback: bounding box center
+    try {
+      const bb = (targetEl as SVGGraphicsElement).getBBox();
+      return new DOMPoint(bb.x + bb.width / 2, bb.y + bb.height / 2);
+    } catch {
+      return null;
+    }
+  };
+
+  const targetPoint = getTargetPoint();
+
+  const buildDotSvg = (suffix: string) => {
+    const filterId = `hero_industry_dot_filter_${suffix}`;
+    const gradId = `hero_industry_dot_grad_${suffix}`;
+    // Matches your example: white -> #F3F4F6 radial, small blur.
+    return `
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none">
+        <g filter="url(#${filterId})">
+          <circle cx="6" cy="6" r="3" fill="url(#${gradId})"/>
+        </g>
+        <defs>
+          <filter id="${filterId}" x="0" y="0" width="12" height="12" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+            <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+            <feGaussianBlur stdDeviation="1" result="effect1_foregroundBlur"/>
+          </filter>
+          <radialGradient id="${gradId}" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(6 6) rotate(90) scale(3)">
+            <stop stop-color="white"/>
+            <stop offset="1" stop-color="#F3F4F6"/>
+          </radialGradient>
+        </defs>
+      </svg>
+    `;
+  };
+
+  paths.forEach((path, i) => {
+    // Skip invalid paths defensively
+    try {
+      if (path.getTotalLength() <= 0) return;
+    } catch {
+      return;
+    }
+
+    const makeDot = (side: 'start' | 'end') => {
+      const attr = `data-hero-industry-path-${side}`;
+      let dot = wrapper.querySelector(`.hero_glow-follow[${attr}="${i}"]`) as HTMLElement | null;
+      if (!dot) {
+        dot = document.createElement('div');
+        dot.className = 'hero_glow-follow';
+        dot.setAttribute(attr, String(i));
+        dot.innerHTML = buildDotSvg(`${requiredTrigger}-${i}-${side}`);
+        // Override size for this dot (don't rely on the default 2.25rem used by home glow).
+        dot.style.width = '0.75rem';
+        dot.style.height = '0.75rem';
+        wrapper.appendChild(dot);
+      }
+      return dot;
+    };
+
+    const dotStart = makeDot('start');
+    const dotEnd = makeDot('end');
+
+    const commonST = {
+      trigger: hero,
+      start: stStart,
+      end: stEnd,
+      scrub: true,
+      invalidateOnRefresh: true,
+    } as const;
+
+    // Find the path progress closest to the target point (so both dots meet there).
+    // If target is missing, fallback to the middle of the path (0.5).
+    const getMeetProgress = (): number => {
+      if (!targetPoint) return 0.5;
+      let bestT = 0.5;
+      let bestD2 = Number.POSITIVE_INFINITY;
+      let totalLen = 0;
+      try {
+        totalLen = path.getTotalLength();
+      } catch {
+        return 0.5;
+      }
+      if (!Number.isFinite(totalLen) || totalLen <= 0) return 0.5;
+
+      const samples = 300;
+      for (let s = 0; s <= samples; s += 1) {
+        const l = (totalLen * s) / samples;
+        const pt = (path as unknown as SVGGeometryElement).getPointAtLength(l);
+        const dx = pt.x - targetPoint.x;
+        const dy = pt.y - targetPoint.y;
+        const d2 = dx * dx + dy * dy;
+        if (d2 < bestD2) {
+          bestD2 = d2;
+          bestT = l / totalLen;
+        }
+      }
+      // Clamp and avoid extreme edge cases
+      return Math.min(1, Math.max(0, bestT));
+    };
+
+    const meetT = getMeetProgress();
+
+    // Kill previous triggers/tweens (avoid stacking)
+    const triggerIdA = `hero-industry-glow:${requiredTrigger}:${i}:start`;
+    const triggerIdB = `hero-industry-glow:${requiredTrigger}:${i}:end`;
+    ScrollTrigger.getById(triggerIdA)?.kill();
+    ScrollTrigger.getById(triggerIdB)?.kill();
+    gsap.killTweensOf(dotStart);
+    gsap.killTweensOf(dotEnd);
+
+    // Dot A: 0% -> meet point
+    gsap.to(dotStart, {
+      ease: 'none',
+      scrollTrigger: {
+        id: triggerIdA,
+        ...commonST,
+      },
+      motionPath: {
+        path,
+        align: path,
+        alignOrigin: [0.5, 0.5],
+        start: 0,
+        end: meetT,
+      },
+    });
+
+    // Dot B: 100% -> meet point
+    gsap.to(dotEnd, {
+      ease: 'none',
+      scrollTrigger: {
+        id: triggerIdB,
+        ...commonST,
+      },
+      motionPath: {
+        path,
+        align: path,
+        alignOrigin: [0.5, 0.5],
+        start: 1,
+        end: meetT,
+      },
+    });
+  });
+}
+
 export function initYellowRadiusGradient(): void {
   const el = document.getElementById('yellow-radius-gradient') as HTMLElement | null;
   if (!el) return;
@@ -241,7 +553,7 @@ export function initYellowRadiusGradient(): void {
       ease: 'power3.out',
       scrollTrigger: {
         trigger: el,
-        start: 'top 75%',
+        start: 'top 50%',
         end: 'top 10%',
         scrub: true,
         invalidateOnRefresh: true,
@@ -250,13 +562,6 @@ export function initYellowRadiusGradient(): void {
   );
 }
 
-/**
- * Accordéon pour les cartes équipe :
- * - clic sur .team_card-svg-wrap (icône dans la carte)
- * - .team_card-overlay : opacity 0 -> 1
- * - .team_card-description-wrap : height 0 -> auto, opacity 0 -> 1
- * - .team_card-more-logo caché, .team_card-less-logo affiché
- */
 export function initTeamCardToggle(): void {
   const triggers = document.querySelectorAll<HTMLElement>('.team_card-svg-wrap');
   if (!triggers.length) return;
