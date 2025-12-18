@@ -14,6 +14,7 @@ export function initNavbarDropdownEffects(): void {
   initDropdownVisibility();
   initMobileDropdownLayoutEffects();
   initDisableDropdownHoverOnMobile();
+  initMobileNavScrollLock();
 }
 
 /**
@@ -65,7 +66,7 @@ function initLogoHoverEffect(): void {
 function initNavbarScrollHide(): void {
   const navbar = document.querySelector('.navbar_component') as HTMLElement | null;
   const heroSection = document.querySelector('.section_hero') as HTMLElement | null;
-  const navbarLogoLink = document.querySelector('.navbar_logo-link') as HTMLElement | null;
+  const navbarLogoLinks = document.querySelectorAll('.navbar_logo-link') as NodeListOf<HTMLElement>;
   if (!navbar) return;
 
   let lastScrollY = window.scrollY;
@@ -83,25 +84,22 @@ function initNavbarScrollHide(): void {
       if (currentY + navbarHeight >= heroBottom) {
         navbar.style.backgroundColor = 'var(--_brand---surface-fill--primary)';
         navbar.style.color = 'var(--_brand---text--primary)';
-        if (navbarLogoLink) {
-          navbarLogoLink.classList.add('is-hover');
-        }
+        navbar.classList.add('is-solid');
+        navbarLogoLinks.forEach((logo) => logo.classList.add('is-hover'));
       } else {
         // Au-dessus / sur le hero : on laisse le style d'origine (transparent),
         // et on retire is-hover (l'effet hover souris peut le remettre).
         navbar.style.backgroundColor = '';
         navbar.style.color = '';
-        if (navbarLogoLink) {
-          navbarLogoLink.classList.remove('is-hover');
-        }
+        navbar.classList.remove('is-solid');
+        navbarLogoLinks.forEach((logo) => logo.classList.remove('is-hover'));
       }
     } else {
       // Pas de section_hero trouvée : on applique toujours le fond + couleur de texte + logo hover
       navbar.style.backgroundColor = 'var(--_brand---surface-fill--primary)';
       navbar.style.color = 'var(--_brand---text--primary)';
-      if (navbarLogoLink) {
-        navbarLogoLink.classList.add('is-hover');
-      }
+      navbar.classList.add('is-solid');
+      navbarLogoLinks.forEach((logo) => logo.classList.add('is-hover'));
     }
   };
 
@@ -119,9 +117,8 @@ function initNavbarScrollHide(): void {
         // En se cachant, on laisse le background géré par le CSS par défaut
         navbar.style.backgroundColor = '';
         navbar.style.color = '';
-        if (navbarLogoLink) {
-          navbarLogoLink.classList.remove('is-hover');
-        }
+        navbar.classList.remove('is-solid');
+        navbarLogoLinks.forEach((logo) => logo.classList.remove('is-hover'));
         isHidden = true;
       }
     } else {
@@ -418,4 +415,67 @@ function initMobileDropdownLayoutEffects(): void {
 
   // État initial
   resetLayout();
+}
+
+/**
+ * Bloque le scroll de la page quand le menu mobile Webflow (w-nav) est ouvert.
+ * Objectif : empêcher le scroll "en dehors" de la navbar pendant l'ouverture.
+ */
+function initMobileNavScrollLock(): void {
+  const navbar = document.querySelector('.navbar_component') as HTMLElement | null;
+  if (!navbar) return;
+
+  const navButton = navbar.querySelector('.w-nav-button') as HTMLElement | null;
+  if (!navButton) return;
+
+  const lockClass = 'is-nav-scroll-locked';
+
+  const isOpen = () =>
+    navButton.classList.contains('w--open') || navButton.getAttribute('aria-expanded') === 'true';
+
+  const lock = () => {
+    if (document.body.classList.contains(lockClass)) return;
+    // iOS-safe scroll lock: freeze body and preserve scroll position
+    const scrollY = window.scrollY || window.pageYOffset || 0;
+    document.body.dataset.scrollLockY = String(scrollY);
+    document.body.classList.add(lockClass);
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
+  };
+
+  const unlock = () => {
+    if (!document.body.classList.contains(lockClass)) return;
+    const y = parseInt(document.body.dataset.scrollLockY || '0', 10) || 0;
+    document.body.classList.remove(lockClass);
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.width = '';
+    delete document.body.dataset.scrollLockY;
+    window.scrollTo(0, y);
+  };
+
+  const apply = () => {
+    // Only lock on mobile/tablet where the menu button is used
+    if (window.innerWidth >= 992) {
+      unlock();
+      return;
+    }
+    if (isOpen()) lock();
+    else unlock();
+  };
+
+  // Observe Webflow open/close state
+  const observer = new MutationObserver(apply);
+  observer.observe(navButton, { attributes: true, attributeFilter: ['class', 'aria-expanded'] });
+
+  // Also react on resize/breakpoint changes
+  window.addEventListener('resize', apply);
+
+  // Initial state
+  apply();
 }

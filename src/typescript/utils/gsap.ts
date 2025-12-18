@@ -8,10 +8,6 @@ gsap.registerPlugin(MorphSVGPlugin, MotionPathPlugin, ScrollTrigger);
  * Init morph SVG for cases cards
  */
 export function initCaseSvgMorph(): void {
-  if (window.innerWidth <= 991) {
-    return;
-  }
-
   const cards = document.querySelectorAll('.cc--case_card') as NodeListOf<HTMLElement>;
   if (!cards.length) return;
 
@@ -231,10 +227,12 @@ export function initYellowRadiusGradient(): void {
   const el = document.getElementById('yellow-radius-gradient') as HTMLElement | null;
   if (!el) return;
 
+  const yFrom = () => (window.innerWidth < 768 ? 60 : 160);
+
   gsap.fromTo(
     el,
     {
-      y: 160,
+      y: yFrom,
       scale: 0.7,
     },
     {
@@ -246,6 +244,7 @@ export function initYellowRadiusGradient(): void {
         start: 'top 75%',
         end: 'top 10%',
         scrub: true,
+        invalidateOnRefresh: true,
       },
     }
   );

@@ -73,12 +73,13 @@
     z-index: 1;
   }
 
-  /* Trigger the arrow hover state when hovering the whole services item */
-  .services_item:hover .services_arrow {
+  .services_item:hover .services_arrow,
+  .location_dropdown:hover .services_arrow {
     color: var(--_brand---text--invert-primary);
   }
 
-  .services_item:hover .services_arrow::before {
+  .services_item:hover .services_arrow::before,
+  .location_dropdown:hover .services_arrow::before {
     transform: translate(-50%, -50%) scale(1);
   }
 }

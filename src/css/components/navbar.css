@@ -1,5 +1,11 @@
 /* -----------------tablet & mobile-------------- */
 @media screen and (max-width: 991px) {
+  body.is-nav-scroll-locked {
+    overflow: hidden;
+    overscroll-behavior: none;
+    touch-action: none;
+  }
+
   .navbar_menu {
     overflow: hidden; /* on confine le scroll à l’intérieur */
     max-height: calc(100vh - 4.5rem);
@@ -30,6 +36,18 @@
     padding-bottom: var(--_responsive---margin--padding--spacer--gap--xlarge);
     padding-left: var(--size--1-25rem);
     background-color: var(--_brand---surface-bg--secondary);
+  }
+
+  /* Ensure logo "is-hover" state is visible on mobile too (JS toggles this class). */
+  .navbar_logo-link.is-hover {
+    color: var(--_brand---text--interaction);
+  }
+
+  /* Burger icon lines: when navbar is in "solid" (scrolled) state */
+  .navbar_component.is-solid .menu-icon1_line-top,
+  .navbar_component.is-solid .menu-icon1_line-middle,
+  .navbar_component.is-solid .menu-icon1_line-bottom {
+    background-color: var(--_brand---surface-fill--interaction);
   }
 
   .navbar_link-column.is-focus {
