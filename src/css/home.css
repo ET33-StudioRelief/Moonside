@@ -14,18 +14,6 @@
   display: block;
 }
 
-/* -----------------section promises-------------- */
-@media screen and (min-width: 1700px) {
-  .promises_lottie-wrap {
-    right: 5%;
-  }
-}
-@media screen and (min-width: 2000px) {
-  .promises_lottie-wrap {
-    right: 10%;
-  }
-}
-
 /* Active state only on desktop (> 991px) */
 @media screen and (min-width: 992px) {
   .services_nav-item.is-active {

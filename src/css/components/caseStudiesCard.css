@@ -6,17 +6,28 @@
   display: block;
 }
 
-/*services list in case card*/
-.case_card-service .w-dyn-items,
-.case_card-service .w-dyn-item,
-.case_card-service [fs-list-field='services'] {
-  display: inline;
+/* -----------------case studies card: services list-------------- */
+/*
+  Webflow CMS renders the "services" multi-reference as:
+  - a list wrapper: .w-dyn-items
+  - repeated items: .w-dyn-item
+  - the field content: [fs-list-field='services']
+
+  We want an aesthetic, single-line display.
+  Final requirement: only show the first service value.
+*/
+
+/* Hide all CMS items by default... */
+.case_card-service .w-dyn-item {
+  display: none;
 }
 
-.case_card-service [fs-list-field='services'] {
+/* ...and only show the first one. */
+.case_card-service .w-dyn-item:first-child {
+  display: block;
+}
+
+/* Make sure the visible text has no extra margins (Webflow often uses <p>). */
+.case_card-service .w-dyn-item:first-child [fs-list-field='services'] {
   margin: 0;
-}
-
-.case_card-service .w-dyn-item:not(:last-child) [fs-list-field='services']::after {
-  content: ', ';
 }

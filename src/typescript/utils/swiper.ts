@@ -18,49 +18,30 @@ export function initHpTestimonialSwiper(): void {
 
 // Instance et listener pour le slider HP case studies (mobile)
 let hpCaseSwiper: Swiper | null = null;
-let hpCaseSwiperResizeBound = false;
 
 // Slider hp case studies - Home Page [Mobile only]
 export function initHpCaseSwiperMobile(): void {
   const container = document.querySelector('.swiper.is-hp-case-studies') as HTMLElement | null;
   if (!container) return;
 
-  const shouldEnable = () => window.innerWidth < 768;
-
-  const createInstance = () => {
-    if (hpCaseSwiper || !shouldEnable()) return;
-
-    hpCaseSwiper = new Swiper(container, {
-      slidesPerView: 1,
-      spaceBetween: 32,
-    });
-  };
-
-  const destroyInstance = () => {
-    if (!hpCaseSwiper) return;
+  // If Webflow re-inits scripts, ensure we don't stack instances
+  if (hpCaseSwiper) {
     hpCaseSwiper.destroy(true, true);
     hpCaseSwiper = null;
-  };
-
-  // Init au chargement selon la largeur courante
-  if (shouldEnable()) {
-    createInstance();
-  } else {
-    destroyInstance();
   }
 
-  // Rendre le slider réactif aux changements de viewport (DevTools, rotation mobile, etc.)
-  if (!hpCaseSwiperResizeBound) {
-    hpCaseSwiperResizeBound = true;
+  hpCaseSwiper = new Swiper(container, {
+    slidesPerView: 'auto',
+    spaceBetween: 32,
+    loop: false,
 
-    window.addEventListener('resize', () => {
-      if (shouldEnable()) {
-        createInstance();
-      } else {
-        destroyInstance();
-      }
-    });
-  }
+    // Prevent "dragging past the last slide" feeling (rubber-band resistance).
+    // If you still feel overscroll, we can also try `resistance: false`.
+    resistanceRatio: 0,
+
+    // If there is only 1 slide (or not enough), disable dragging.
+    watchOverflow: true,
+  });
 }
 
 // Slider hp-industries - Home Page [Mobile only]

@@ -12,12 +12,15 @@ import { initNavbarDropdownEffects, initNavbarHoverEffects } from './typescript/
 import { initSectionRevealOnScroll, svgComponent } from './typescript/global';
 import {
   initIndustriesToggle,
+  initPromisesLottiePlayOnEnter,
   initServicesFlexSwitcher,
   initServicesToggle,
 } from './typescript/home';
 import {
   initAdvantagesScrollFollow,
   initCaseSvgMorph,
+  initHeroIndustryGlow,
+  initHeroMultiPathGlow,
   initHeroPathGlow,
   initTeamCardToggle,
   initYellowRadiusGradient,
@@ -32,6 +35,7 @@ window.Webflow ||= [];
 window.Webflow.push(() => {
   svgComponent();
   initSectionRevealOnScroll();
+  initPromisesLottiePlayOnEnter();
   initNavbarHoverEffects();
   initNavbarDropdownEffects();
   initServicesToggle();
@@ -40,7 +44,10 @@ window.Webflow.push(() => {
   initAboutInteractions();
   initCaseSvgMorph();
   initAdvantagesScrollFollow();
-  initHeroPathGlow();
+  // Runs only if a matching hero exists (the function returns early otherwise).
+  initHeroPathGlow('hero-home');
+  initHeroMultiPathGlow('hero-services');
+  initHeroIndustryGlow('hero-industry');
   initYellowRadiusGradient();
   initTeamCardToggle();
   initHpTestimonialSwiper();
