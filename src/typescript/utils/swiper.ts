@@ -91,7 +91,7 @@ export function initHpIndustriesSlider(): void {
   });
 }
 
-// Slider hp case studies - Home Page [Mobile only]
+// Slider services
 export function initServicesSlider(): void {
   const container = document.querySelector('.swiper.is-services') as HTMLElement | null;
   if (!container) return;

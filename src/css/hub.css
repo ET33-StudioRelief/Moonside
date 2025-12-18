@@ -1,13 +1,13 @@
 /* Desktop / tablette : 2 colonnes (≥ 768px) */
 @media screen and (min-width: 768px) {
-  .cases_cards-wrap > *:nth-child(2n) {
+  .cases_cards-wrap.is-hub > *:nth-child(2n) {
     margin-top: 3rem;
   }
 }
 
 /* Mobile : 1 colonne (< 768px) — on neutralise le décalage */
 @media screen and (max-width: 767px) {
-  .cases_cards-wrap > *:nth-child(2n) {
+  .cases_cards-wra.is-hub > *:nth-child(2n) {
     margin-top: 0;
   }
 }
@@ -25,11 +25,4 @@
 .cases_number-filter.is-visible {
   opacity: 1;
   pointer-events: auto;
-}
-
-/* Hide left margin column on mid-size screens (992px–1300px) */
-@media screen and (min-width: 992px) and (max-width: 1300px) {
-  .cases_left-margin {
-    display: none;
-  }
 }
