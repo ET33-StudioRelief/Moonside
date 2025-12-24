@@ -30,3 +30,16 @@
 .swiper-pagination.is-hp-testimonial .swiper-pagination-bullet-active {
   opacity: 1;
 }
+
+/* ----------------- swiper HP Industries (slider)-------------- */
+.swiper.is-hp-industries {
+  overflow: hidden;
+}
+
+.swiper.is-hp-industries .swiper-wrapper {
+  display: flex;
+}
+
+.swiper.is-hp-industries .swiper-slide {
+  flex: 0 0 100%;
+}

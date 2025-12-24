@@ -18,6 +18,8 @@ export function initHpTestimonialSwiper(): void {
 
 // Instance et listener pour le slider HP case studies (mobile)
 let hpCaseSwiper: Swiper | null = null;
+let hpIndustriesSwiper: Swiper | null = null;
+let hpIndustriesResizeBound = false;
 
 // Slider hp case studies - Home Page [Mobile only]
 export function initHpCaseSwiperMobile(): void {
@@ -46,49 +48,93 @@ export function initHpCaseSwiperMobile(): void {
 
 // Slider hp-industries - Home Page [Mobile only]
 export function initHpIndustriesSlider(): void {
-  // Mobile only: skip on tablet/desktop
-  if (window.innerWidth >= 992) {
-    return;
-  }
+  const sync = () => {
+    // Webflow toggles between grid and slider by breakpoint.
+    // Initialize when the slider becomes visible; destroy when hidden.
+    const sliderRoot = document.querySelector('.hp-industries_slider') as HTMLElement | null;
 
-  // Grab the main swiper container and nav arrows
-  const container = document.querySelector('.swiper.is-hp-industries') as HTMLElement | null;
-  const nextEl = document.querySelector('.slider-arrow.is-next') as HTMLElement | null;
-  const prevEl = document.querySelector('.slider-arrow.is-prev') as HTMLElement | null;
-  if (!container || !nextEl || !prevEl) return;
-
-  // Target where we display the current industry label
-  const titleEl = document.getElementById('industries-slider-title') as HTMLElement | null;
-
-  // Sync the title with the active slide's data-industries
-  const updateTitle = (swiper: Swiper) => {
-    if (!titleEl) return;
-    const activeSlide = swiper.slides[swiper.activeIndex] as HTMLElement | undefined;
-    const card = activeSlide?.querySelector('.cc--hp-industries_slide') as HTMLElement | null;
-    const key = card?.getAttribute('data-industries');
-    if (key) {
-      titleEl.textContent = key;
+    if (!sliderRoot) {
+      if (hpIndustriesSwiper) {
+        hpIndustriesSwiper.destroy(true, true);
+        hpIndustriesSwiper = null;
+      }
+      return;
     }
+
+    const isVisible = window.getComputedStyle(sliderRoot).display !== 'none';
+    if (!isVisible) {
+      if (hpIndustriesSwiper) {
+        hpIndustriesSwiper.destroy(true, true);
+        hpIndustriesSwiper = null;
+      }
+      return;
+    }
+
+    // Already initialized and visible
+    if (hpIndustriesSwiper) {
+      hpIndustriesSwiper.update();
+      return;
+    }
+
+    // Grab the swiper container and nav arrows (scoped to this slider)
+    const container = sliderRoot.querySelector('.swiper.is-hp-industries') as HTMLElement | null;
+    const nextEl = sliderRoot.querySelector('.slider-arrow.is-next') as HTMLElement | null;
+    const prevEl = sliderRoot.querySelector('.slider-arrow.is-prev') as HTMLElement | null;
+    if (!container || !nextEl || !prevEl) return;
+
+    // Target where we display the current industry label
+    const titleEl = document.getElementById('industries-slider-title') as HTMLElement | null;
+
+    // Sync the title with the active slide's data-industries
+    const updateTitle = (swiper: Swiper) => {
+      if (!titleEl) return;
+      const activeSlide = swiper.slides[swiper.activeIndex] as HTMLElement | undefined;
+      const card = activeSlide?.querySelector('.cc--hp-industries_slide') as HTMLElement | null;
+      const key = card?.getAttribute('data-industries');
+      if (key) titleEl.textContent = key;
+    };
+
+    hpIndustriesSwiper = new Swiper(container, {
+      modules: [Navigation],
+      slidesPerView: 1,
+      spaceBetween: 24,
+      loop: true,
+      autoHeight: true,
+      navigation: {
+        nextEl,
+        prevEl,
+      },
+      observer: true,
+      observeParents: true,
+      on: {
+        init(swiper) {
+          updateTitle(swiper);
+        },
+        slideChange(swiper) {
+          updateTitle(swiper);
+        },
+      },
+    });
   };
 
-  new Swiper(container, {
-    modules: [Navigation],
-    slidesPerView: 1,
-    spaceBetween: 24,
-    loop: true,
-    navigation: {
-      nextEl,
-      prevEl,
-    },
-    on: {
-      init(swiper) {
-        updateTitle(swiper);
+  // Run once now
+  sync();
+
+  // Ensure it reacts to viewport resize (Webflow doesn't re-run scripts on resize).
+  if (!hpIndustriesResizeBound) {
+    hpIndustriesResizeBound = true;
+    let raf = 0;
+    window.addEventListener(
+      'resize',
+      () => {
+        window.cancelAnimationFrame(raf);
+        raf = window.requestAnimationFrame(() => {
+          sync();
+        });
       },
-      slideChange(swiper) {
-        updateTitle(swiper);
-      },
-    },
-  });
+      { passive: true }
+    );
+  }
 }
 
 // Slider services

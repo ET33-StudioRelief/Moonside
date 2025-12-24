@@ -7,16 +7,6 @@
 }
 
 /* -----------------case studies card: services list-------------- */
-/*
-  Webflow CMS renders the "services" multi-reference as:
-  - a list wrapper: .w-dyn-items
-  - repeated items: .w-dyn-item
-  - the field content: [fs-list-field='services']
-
-  We want an aesthetic, single-line display.
-  Final requirement: only show the first service value.
-*/
-
 /* Hide all CMS items by default... */
 .case_card-service .w-dyn-item {
   display: none;
@@ -30,4 +20,15 @@
 /* Make sure the visible text has no extra margins (Webflow often uses <p>). */
 .case_card-service .w-dyn-item:first-child [fs-list-field='services'] {
   margin: 0;
+}
+
+/* -----------------case studies card: alternate "big" layout-------------- */
+/* Apply the same layout as `.is-inverse { flex-flow: row-reverse; }`
+   to every other `.cc--case_card.is-big` inside case lists.
+*/
+.cases_cards-col > :nth-child(even) .cc--case_card.is-big,
+.cases_wrapper > :nth-child(even) .cc--case_card.is-big,
+.cases_cards-col .w-dyn-item:nth-child(even) .cc--case_card.is-big,
+.cases_wrapper .w-dyn-item:nth-child(even) .cc--case_card.is-big {
+  flex-flow: row-reverse;
 }

@@ -1,0 +1,18 @@
+@media screen and (min-width: 992px) and (max-width: 1200px) {
+  .section_cta {
+    display: flex;
+    padding-top: var(--size--4rem);
+    padding-right: var(--size--2rem);
+    padding-bottom: var(--size--4rem);
+    padding-left: var(--size--2rem);
+    justify-content: center;
+    align-items: center;
+  }
+  .cta_line-wrap {
+    display: none;
+  }
+  .cta_lottie-wrap.is-desktop {
+    justify-content: flex-end;
+    align-items: center;
+  }
+}

@@ -5,5 +5,7 @@
 @import './css/components/footer.css';
 @import './css/components/modal.css';
 @import './css/hub.css';
-@import './css/animation.css';
+@import './css/components/animation.css';
 @import './css/components/caseStudiesCard.css';
+@import './css/components/cta.css';
+@import './css/about.css';

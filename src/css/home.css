@@ -86,7 +86,7 @@
     opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Open state : height "auto" simulated via a max-height sufficiently large */
+/* Open state : height "auto" simulated via a max-height sufficiently large (works for all services) */
 .services_item.is-open .services_txt-content {
   max-height: 100vh; /* ajuste si besoin selon la hauteur max attendue */
   opacity: 1;
@@ -165,4 +165,60 @@
 .hp-industries_left-col .hp-industries_txt-content.is-active {
   opacity: 1;
   z-index: 4 !important; /* supérieur aux is-zindex1/2/3 définis côté Webflow */
+}
+
+@media screen and (min-width: 992px) and (max-width: 1200px) {
+  .hp-industries_grid {
+    display: none;
+  }
+  .hp-industries_slider {
+    display: block;
+  }
+  .hp-industries_arrow-wrap {
+    display: flex;
+    column-gap: var(--_responsive---margin--padding--spacer--gap--small);
+    row-gap: var(--_responsive---margin--padding--spacer--gap--small);
+  }
+  .slider-arrow {
+    width: 2.5rem;
+    height: 2.5rem;
+    padding-top: var(--size--0-5rem);
+    padding-right: var(--size--0-5rem);
+    padding-bottom: var(--size--0-5rem);
+    padding-left: var(--size--0-5rem);
+  }
+  .hp-industries_slider-nav-wrapper {
+    display: flex;
+    padding-top: var(--size--1rem);
+    padding-bottom: var(--size--1rem);
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid black;
+  }
+  .hp-industries_slider-title {
+    display: flex;
+    column-gap: var(--_responsive---margin--padding--spacer--gap--large);
+    row-gap: var(--_responsive---margin--padding--spacer--gap--large);
+    text-transform: capitalize;
+  }
+  .swiper-wrapper {
+    display: flex;
+  }
+  .swiper-wrapper.is-hp-industries {
+    width: 100%;
+  }
+  .swiper-slide.is-hp-industries {
+    width: 100%;
+    min-width: 100%;
+  }
+  .cc--hp-industries_slide {
+    display: flex;
+    width: 100%;
+    flex-flow: column;
+    column-gap: var(--_responsive---margin--padding--spacer--gap--huge);
+    row-gap: var(--_responsive---margin--padding--spacer--gap--huge);
+  }
+  .hp-industries_txt-content.is-mobile {
+    position: static;
+  }
 }
