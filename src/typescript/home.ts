@@ -118,12 +118,18 @@ export function initServicesFlexSwitcher(): void {
     });
 
     // Met à jour l'état visuel (opacity / z-index / pointer-events)
+    // IMPORTANT:
+    // Webflow stacks `.services_flex` with absolute positioning (except the initial one).
+    // If the active block stays `position:absolute`, opening dropdowns won't affect the parent's height
+    // and content will overflow. Force the active block into the flow.
     flexByKey.forEach((block, k) => {
       if (k === key) {
+        block.style.position = 'relative';
         block.style.opacity = '1';
         block.style.zIndex = '3';
         block.style.pointerEvents = 'auto';
       } else {
+        block.style.position = 'absolute';
         block.style.opacity = '0';
         block.style.zIndex = '1';
         block.style.pointerEvents = 'none';

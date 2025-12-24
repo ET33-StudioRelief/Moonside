@@ -19,6 +19,7 @@ import {
 import {
   initAdvantagesScrollFollow,
   initCaseSvgMorph,
+  initHeroHubGlow,
   initHeroIndustryGlow,
   initHeroMultiPathGlow,
   initHeroPathGlow,
@@ -48,6 +49,7 @@ window.Webflow.push(() => {
   initHeroPathGlow('hero-home');
   initHeroMultiPathGlow('hero-services');
   initHeroIndustryGlow('hero-industry');
+  initHeroHubGlow('hero-hub');
   initYellowRadiusGradient();
   initTeamCardToggle();
   initHpTestimonialSwiper();

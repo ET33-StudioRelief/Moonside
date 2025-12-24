@@ -327,14 +327,11 @@ export function initHeroMultiPathGlow(requiredTrigger: string): void {
 
 /**
  * Hero industry: multi-path "dot" glow (radial gradient)
- * Requirement: for each path in the embed, create 2 dots (one at each end) that travel toward the center.
+ * Requirement (updated): only generate 3 dots total, each travelling along one LINE (path).
  *
  * This is intentionally simpler than `initHeroPathGlow`:
- * - no visible-segment sampling
- * - 2 dots per path
- *
- * Optional per-hero overrides on the section:
- * - data-hero-glow-start / data-hero-glow-end (ScrollTrigger)
+ * - targets 3 stroked line paths (exclude dashed orbits)
+ * - 1 dot per line (3 lines max)
  */
 export function initHeroIndustryGlow(requiredTrigger = 'hero-industry'): void {
   if (typeof document === 'undefined') return;
@@ -359,48 +356,12 @@ export function initHeroIndustryGlow(requiredTrigger = 'hero-industry'): void {
   const svg = wrapper.querySelector('svg') as SVGSVGElement | null;
   if (!svg) return;
 
-  // Only "path" as requested (your embed also contains ellipses/circles; we ignore them here).
-  const paths = Array.from(svg.querySelectorAll('path')) as SVGPathElement[];
-  if (!paths.length) return;
-
-  // Target point where the 2 dots should meet.
-  // Default: the circle that uses `fill="url(#paint0_radial_2519_2305)"` in your embed.
-  const targetGradientId =
-    (hero.getAttribute('data-hero-industry-target-gradient') || '').trim() ||
-    'paint0_radial_2519_2305';
-  const targetEl =
-    (svg.querySelector(`[fill="url(#${targetGradientId})"]`) as SVGGraphicsElement | null) ?? null;
-  const getTargetPoint = (): DOMPoint | null => {
-    // Allow explicit override if needed
-    const cxRaw = (hero.getAttribute('data-hero-industry-target-cx') || '').trim();
-    const cyRaw = (hero.getAttribute('data-hero-industry-target-cy') || '').trim();
-    if (cxRaw && cyRaw) {
-      const cx = Number.parseFloat(cxRaw);
-      const cy = Number.parseFloat(cyRaw);
-      if (Number.isFinite(cx) && Number.isFinite(cy)) return new DOMPoint(cx, cy);
-    }
-
-    if (!targetEl) return null;
-
-    // Most of the time it's a <circle> with cx/cy
-    const cx = Number.parseFloat(
-      (targetEl as unknown as SVGCircleElement).getAttribute('cx') || ''
-    );
-    const cy = Number.parseFloat(
-      (targetEl as unknown as SVGCircleElement).getAttribute('cy') || ''
-    );
-    if (Number.isFinite(cx) && Number.isFinite(cy)) return new DOMPoint(cx, cy);
-
-    // Fallback: bounding box center
-    try {
-      const bb = (targetEl as SVGGraphicsElement).getBBox();
-      return new DOMPoint(bb.x + bb.width / 2, bb.y + bb.height / 2);
-    } catch {
-      return null;
-    }
-  };
-
-  const targetPoint = getTargetPoint();
+  // Target ONLY "line" paths (your embed has 5), excluding dashed orbits and filled blobs.
+  const lineCandidates = Array.from(
+    svg.querySelectorAll('path[stroke]:not([stroke-dasharray])')
+  ) as SVGPathElement[];
+  const lines = lineCandidates.slice(0, 3);
+  if (!lines.length) return;
 
   const buildDotSvg = (suffix: string) => {
     const filterId = `hero_industry_dot_filter_${suffix}`;
@@ -426,112 +387,176 @@ export function initHeroIndustryGlow(requiredTrigger = 'hero-industry'): void {
     `;
   };
 
-  paths.forEach((path, i) => {
+  // Cleanup previous versions dots/triggers (avoid stacking)
+  ScrollTrigger.getAll().forEach((st) => {
+    const id = st.vars?.id;
+    if (typeof id === 'string' && id.startsWith(`hero-industry-glow:${requiredTrigger}:`)) {
+      st.kill();
+    }
+    if (typeof id === 'string' && id.startsWith(`hero-industry-dot:${requiredTrigger}:`)) {
+      st.kill();
+    }
+  });
+  wrapper
+    .querySelectorAll<HTMLElement>(
+      '.hero_glow-follow[data-hero-industry-path-start], .hero_glow-follow[data-hero-industry-path-end]'
+    )
+    .forEach((el) => el.remove());
+  wrapper
+    .querySelectorAll<HTMLElement>('.hero_glow-follow[data-hero-industry-dot]')
+    .forEach((el) => el.remove());
+
+  const commonST = {
+    trigger: hero,
+    start: stStart,
+    end: stEnd,
+    scrub: true,
+    invalidateOnRefresh: true,
+  } as const;
+
+  // Create only 3 dots total (1 per line)
+  lines.forEach((line, i) => {
     // Skip invalid paths defensively
     try {
-      if (path.getTotalLength() <= 0) return;
+      if (line.getTotalLength() <= 0) return;
     } catch {
       return;
     }
 
-    const makeDot = (side: 'start' | 'end') => {
-      const attr = `data-hero-industry-path-${side}`;
-      let dot = wrapper.querySelector(`.hero_glow-follow[${attr}="${i}"]`) as HTMLElement | null;
-      if (!dot) {
-        dot = document.createElement('div');
-        dot.className = 'hero_glow-follow';
-        dot.setAttribute(attr, String(i));
-        dot.innerHTML = buildDotSvg(`${requiredTrigger}-${i}-${side}`);
-        // Override size for this dot (don't rely on the default 2.25rem used by home glow).
-        dot.style.width = '0.75rem';
-        dot.style.height = '0.75rem';
-        wrapper.appendChild(dot);
-      }
-      return dot;
-    };
+    const triggerId = `hero-industry-dot:${requiredTrigger}:${i}`;
+    ScrollTrigger.getById(triggerId)?.kill();
 
-    const dotStart = makeDot('start');
-    const dotEnd = makeDot('end');
+    let dot = wrapper.querySelector(
+      `.hero_glow-follow[data-hero-industry-dot="${i}"]`
+    ) as HTMLElement | null;
+    if (!dot) {
+      dot = document.createElement('div');
+      dot.className = 'hero_glow-follow';
+      dot.setAttribute('data-hero-industry-dot', String(i));
+      dot.innerHTML = buildDotSvg(`${requiredTrigger}-${i}`);
+      dot.style.width = '0.75rem';
+      dot.style.height = '0.75rem';
+      wrapper.appendChild(dot);
+    }
 
-    const commonST = {
-      trigger: hero,
-      start: stStart,
-      end: stEnd,
-      scrub: true,
-      invalidateOnRefresh: true,
-    } as const;
+    gsap.killTweensOf(dot);
 
-    // Find the path progress closest to the target point (so both dots meet there).
-    // If target is missing, fallback to the middle of the path (0.5).
-    const getMeetProgress = (): number => {
-      if (!targetPoint) return 0.5;
-      let bestT = 0.5;
-      let bestD2 = Number.POSITIVE_INFINITY;
-      let totalLen = 0;
-      try {
-        totalLen = path.getTotalLength();
-      } catch {
-        return 0.5;
-      }
-      if (!Number.isFinite(totalLen) || totalLen <= 0) return 0.5;
-
-      const samples = 300;
-      for (let s = 0; s <= samples; s += 1) {
-        const l = (totalLen * s) / samples;
-        const pt = (path as unknown as SVGGeometryElement).getPointAtLength(l);
-        const dx = pt.x - targetPoint.x;
-        const dy = pt.y - targetPoint.y;
-        const d2 = dx * dx + dy * dy;
-        if (d2 < bestD2) {
-          bestD2 = d2;
-          bestT = l / totalLen;
-        }
-      }
-      // Clamp and avoid extreme edge cases
-      return Math.min(1, Math.max(0, bestT));
-    };
-
-    const meetT = getMeetProgress();
-
-    // Kill previous triggers/tweens (avoid stacking)
-    const triggerIdA = `hero-industry-glow:${requiredTrigger}:${i}:start`;
-    const triggerIdB = `hero-industry-glow:${requiredTrigger}:${i}:end`;
-    ScrollTrigger.getById(triggerIdA)?.kill();
-    ScrollTrigger.getById(triggerIdB)?.kill();
-    gsap.killTweensOf(dotStart);
-    gsap.killTweensOf(dotEnd);
-
-    // Dot A: 0% -> meet point
-    gsap.to(dotStart, {
+    gsap.to(dot, {
       ease: 'none',
       scrollTrigger: {
-        id: triggerIdA,
+        id: triggerId,
         ...commonST,
       },
       motionPath: {
-        path,
-        align: path,
-        alignOrigin: [0.5, 0.5],
-        start: 0,
-        end: meetT,
-      },
-    });
-
-    // Dot B: 100% -> meet point
-    gsap.to(dotEnd, {
-      ease: 'none',
-      scrollTrigger: {
-        id: triggerIdB,
-        ...commonST,
-      },
-      motionPath: {
-        path,
-        align: path,
+        path: line,
+        align: line,
         alignOrigin: [0.5, 0.5],
         start: 1,
-        end: meetT,
+        end: 0,
       },
     });
+  });
+}
+
+/**
+ * Hub hero: move the existing radial-gradient circle (paint0_radial_2504_8291)
+ * along the dashed stroke path from left -> right, scrubbed by scroll.
+ *
+ * Expected SVG structure (Webflow embed):
+ * - a dashed path: <path ... stroke-dasharray="3 3" .../>
+ * - a glow circle: <circle ... fill="url(#paint0_radial_2504_8291)"/>
+ */
+export function initHeroHubGlow(requiredTrigger = 'hero-hub'): void {
+  if (typeof document === 'undefined') return;
+
+  const escapeAttr = (value: string) => {
+    const cssObj = (window as unknown as { CSS?: { escape?: (v: string) => string } }).CSS;
+    if (typeof cssObj?.escape === 'function') return cssObj.escape(value);
+    return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  };
+
+  const triggerValue = escapeAttr(requiredTrigger);
+  const hero = document.querySelector(
+    `.section_hero[trigger="${triggerValue}"], .section_small-hero[trigger="${triggerValue}"]`
+  ) as HTMLElement | null;
+  if (!hero) return;
+
+  const wrapper =
+    (hero.querySelector('.hero_decorative-wrapper') as HTMLElement | null) ??
+    (hero.querySelector('.small-hero_decorativ-wrap') as HTMLElement | null) ??
+    (hero as HTMLElement);
+  const svg = wrapper.querySelector('svg') as SVGSVGElement | null;
+  if (!svg) return;
+
+  // The path we want is the dashed stroked one (avoid the blurred filled blob path).
+  const path =
+    (svg.querySelector('path[stroke-dasharray]') as SVGPathElement | null) ??
+    (svg.querySelector('path[stroke]') as SVGPathElement | null);
+  if (!path) return;
+
+  // NOTE:
+  // The embedded SVG dot is wrapped in a <g filter="..."> with `filterUnits="userSpaceOnUse"`
+  // and a fixed {x,y,width,height}. If we move that circle, it often gets clipped (becomes invisible)
+  // once it leaves the filter region.
+  //
+  // To keep the glow visible across the whole path, we animate a DOM glow element on top of the SVG.
+
+  // Ensure wrapper can position children absolutely.
+  const wrapperStyle = window.getComputedStyle(wrapper);
+  if (wrapperStyle.position === 'static') {
+    wrapper.style.position = 'relative';
+  }
+
+  // Reuse the same glow node (avoid duplicates on re-init)
+  let glow = wrapper.querySelector(
+    '.hero_glow-follow[data-hero-hub-glow="1"]'
+  ) as HTMLElement | null;
+  if (!glow) {
+    glow = document.createElement('div');
+    glow.className = 'hero_glow-follow';
+    glow.setAttribute('data-hero-hub-glow', '1');
+    glow.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <g filter="url(#hub_glow_filter)">
+          <circle cx="14" cy="14" r="10" fill="url(#hub_glow_grad)"/>
+        </g>
+        <defs>
+          <filter id="hub_glow_filter" x="0" y="0" width="28" height="28" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+            <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+            <feGaussianBlur stdDeviation="2" result="effect1_foregroundBlur"/>
+          </filter>
+          <radialGradient id="hub_glow_grad" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(14 14) rotate(90) scale(10)">
+            <stop stop-color="white"/>
+            <stop offset="1" stop-color="#FFE8B2"/>
+          </radialGradient>
+        </defs>
+      </svg>
+    `;
+    wrapper.appendChild(glow);
+  }
+
+  const triggerId = `hero-hub-glow:${requiredTrigger}`;
+  ScrollTrigger.getById(triggerId)?.kill();
+  gsap.killTweensOf(glow);
+
+  gsap.to(glow, {
+    ease: 'none',
+    scrollTrigger: {
+      id: triggerId,
+      trigger: hero,
+      start: 'top top',
+      end: 'bottom top',
+      scrub: true,
+      invalidateOnRefresh: true,
+    },
+    motionPath: {
+      path,
+      align: path,
+      alignOrigin: [0.5, 0.5],
+      start: 0,
+      end: 1,
+    },
   });
 }
 
@@ -579,15 +604,9 @@ export function initTeamCardToggle(): void {
 
     const tl = gsap.timeline({ paused: true });
 
+    // Overlay visibility is handled by CSS on hover / open state.
+    // Keeping it out of GSAP avoids inline styles overriding the hover CSS.
     tl.to(
-      overlay,
-      {
-        opacity: 1,
-        duration: 0.3,
-        ease: 'power2.out',
-      },
-      0
-    ).to(
       description,
       {
         height: 'auto',
@@ -613,9 +632,11 @@ export function initTeamCardToggle(): void {
     trigger.addEventListener('click', () => {
       if (!isOpen) {
         tl.play();
+        card.classList.add('is-open');
         isOpen = true;
       } else {
         tl.reverse();
+        card.classList.remove('is-open');
         isOpen = false;
       }
     });

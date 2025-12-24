@@ -1,0 +1,9 @@
+/* -----------------team card-------------- */
+.team_card-overlay {
+  transition: opacity 0.3s ease-out;
+}
+
+.team_card:hover .team_card-overlay,
+.team_card.is-open .team_card-overlay {
+  opacity: 1;
+}
