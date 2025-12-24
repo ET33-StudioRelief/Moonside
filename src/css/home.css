@@ -222,3 +222,14 @@
     position: static;
   }
 }
+
+/* -----------------keys numbers: mid-size screens-------------- */
+@media screen and (min-width: 992px) and (max-width: 1300px) {
+  .keys-number_nbr-txt {
+    font-size: 2.5rem;
+  }
+
+  .keys-number_nbr-txt.is-h4 {
+    font-size: 1.5rem;
+  }
+}

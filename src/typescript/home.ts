@@ -214,9 +214,6 @@ function updateServicesSvgForItem(item: HTMLElement): void {
   }
 }
 
-/**
- * -----------------section hp industries--------------
- */
 export function initIndustriesToggle(): void {
   // Actif uniquement sur desktop (largeur strictement > 991px)
   if (window.innerWidth <= 991) {
@@ -279,11 +276,6 @@ export function initIndustriesToggle(): void {
   });
 }
 
-/**
- * Webflow Lottie: play only when the promises section enters the viewport.
- * - Default: freeze the animation at frame 0 (even if Webflow autoplays).
- * - On enter: play once from the beginning.
- */
 export function initPromisesLottiePlayOnEnter(): void {
   if (typeof document === 'undefined') return;
   if (typeof window === 'undefined' || !('IntersectionObserver' in window)) return;
