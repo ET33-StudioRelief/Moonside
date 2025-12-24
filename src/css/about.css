@@ -7,3 +7,9 @@
 .team_card.is-open .team_card-overlay {
   opacity: 1;
 }
+
+@media screen and (min-width: 992px) and (max-width: 1300px) {
+  .team_collection-list {
+    grid-template-columns: 1fr 1fr;
+  }
+}

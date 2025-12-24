@@ -211,6 +211,12 @@
     width: 100%;
     min-width: 100%;
   }
+  .hp-industries_img-wrap.is-mobile {
+    height: auto;
+    padding-right: var(--size--2rem);
+    padding-left: var(--size--2rem);
+    aspect-ratio: auto;
+  }
   .cc--hp-industries_slide {
     display: flex;
     width: 100%;
