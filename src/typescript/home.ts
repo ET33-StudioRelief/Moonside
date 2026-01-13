@@ -422,3 +422,50 @@ export function initPromisesLottiePlayOnEnter(): void {
 
   sections.forEach((s) => observer.observe(s));
 }
+
+/**
+ * Sync `padding-left` of hero elements with the width of a reference element.
+ */
+export function initHeroPaddingSync(): void {
+  if (typeof document === 'undefined' || typeof window === 'undefined') return;
+
+  const refSelector = '.hero_span-ref-padding';
+  const headingSelector = '.hero_span-heading';
+  const subtitleSelector = '.hero_subtitle';
+
+  const sync = () => {
+    const refElement = document.querySelector<HTMLElement>(refSelector);
+    if (!refElement) return;
+
+    const headingSpan = document.querySelector<HTMLElement>(headingSelector);
+    const subtitle = document.querySelector<HTMLElement>(subtitleSelector);
+    if (!headingSpan && !subtitle) return;
+
+    const refWidth = refElement.offsetWidth;
+
+    if (headingSpan) headingSpan.style.paddingLeft = `${refWidth}px`;
+    if (subtitle) subtitle.style.paddingLeft = `${refWidth}px`;
+  };
+
+  // Run once now
+  sync();
+
+  // Avoid stacking resize listeners if Webflow re-inits scripts
+  const boundKey = 'heroPaddingSyncBound';
+  const docEl = document.documentElement as HTMLElement & { dataset: DOMStringMap };
+  if (docEl.dataset[boundKey] === '1') return;
+  docEl.dataset[boundKey] = '1';
+
+  // Recalculate on resize (debounced)
+  let resizeTimeout: number | null = null;
+  window.addEventListener(
+    'resize',
+    () => {
+      if (resizeTimeout !== null) window.clearTimeout(resizeTimeout);
+      resizeTimeout = window.setTimeout(() => {
+        sync();
+      }, 100);
+    },
+    { passive: true }
+  );
+}

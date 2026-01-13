@@ -1,5 +1,5 @@
 import Swiper from 'swiper';
-import { Navigation, Pagination } from 'swiper/modules';
+import { Autoplay, Navigation, Pagination } from 'swiper/modules';
 
 // Slider hp testimonial - Home Page
 export function initHpTestimonialSwiper(): void {
@@ -145,5 +145,32 @@ export function initServicesSlider(): void {
   new Swiper(container, {
     slidesPerView: 'auto',
     spaceBetween: 32,
+  });
+}
+// Slider partners
+export function initPartnersSwiper(): void {
+  const container = document.querySelector('.swiper.is-partners') as HTMLElement | null;
+  if (!container) return;
+
+  new Swiper(container, {
+    modules: [Autoplay],
+    slidesPerView: 3,
+    breakpoints: {
+      992: {
+        slidesPerView: 4,
+      },
+      1200: {
+        slidesPerView: 5,
+      },
+    },
+    spaceBetween: 80,
+    loop: true,
+    speed: 6000,
+    autoplay: {
+      // Marquee-like continuous autoplay (no "steps")
+      delay: 0,
+      disableOnInteraction: false,
+      pauseOnMouseEnter: true,
+    },
   });
 }
