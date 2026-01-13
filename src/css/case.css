@@ -1,0 +1,4 @@
+/* -----------------CMS conditional visibility (Webflow)-------------- */
+.summary_services-list .w-dyn-item:has(> .w-condition-invisible) {
+  display: none !important;
+}

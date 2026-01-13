@@ -31,15 +31,12 @@
   opacity: 1;
 }
 
-/* ----------------- swiper HP Industries (slider)-------------- */
-.swiper.is-hp-industries {
-  overflow: hidden;
+/* ----------------- swiper Partners (continuous autoplay) -------------- */
+.swiper.is-partners .swiper-wrapper {
+  transition-timing-function: linear !important;
 }
 
-.swiper.is-hp-industries .swiper-wrapper {
-  display: flex;
-}
-
-.swiper.is-hp-industries .swiper-slide {
-  flex: 0 0 100%;
+.swiper.is-partners .swiper-slide {
+  flex: 0 0 auto;
+  box-sizing: border-box;
 }

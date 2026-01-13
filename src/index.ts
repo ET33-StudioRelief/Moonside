@@ -11,11 +11,13 @@ import {
 import { initNavbarDropdownEffects, initNavbarHoverEffects } from './typescript/components/navbar';
 import { initSectionRevealOnScroll, svgComponent } from './typescript/global';
 import {
+  initHeroPaddingSync,
   initIndustriesToggle,
   initPromisesLottiePlayOnEnter,
   initServicesFlexSwitcher,
   initServicesToggle,
 } from './typescript/home';
+import { initKeysNumberDesktopLottiePlayOnEnter } from './typescript/lottie';
 import {
   initAdvantagesScrollFollow,
   initCaseSvgMorph,
@@ -30,13 +32,16 @@ import {
   initHpCaseSwiperMobile,
   initHpIndustriesSlider,
   initHpTestimonialSwiper,
+  initPartnersSwiper,
   initServicesSlider,
 } from './typescript/utils/swiper';
+
 window.Webflow ||= [];
 window.Webflow.push(() => {
   svgComponent();
   initSectionRevealOnScroll();
   initPromisesLottiePlayOnEnter();
+  initHeroPaddingSync();
   initNavbarHoverEffects();
   initNavbarDropdownEffects();
   initServicesToggle();
@@ -55,10 +60,12 @@ window.Webflow.push(() => {
   initHpTestimonialSwiper();
   initHpCaseSwiperMobile();
   initHpIndustriesSlider();
+  initPartnersSwiper();
   initContactModal();
   initContactPhoneValidation();
   initHideFirstOptionSelects();
   initContactModalSuccessLayout();
   initServicesSlider();
   initHubFilters();
+  initKeysNumberDesktopLottiePlayOnEnter();
 });
