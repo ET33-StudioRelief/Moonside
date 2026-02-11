@@ -432,13 +432,22 @@ export function initHeroPaddingSync(): void {
   const refSelector = '.hero_span-ref-padding';
   const headingSelector = '.hero_span-heading';
   const subtitleSelector = '.hero_subtitle';
+  const BREAKPOINT = 991;
 
   const sync = () => {
-    const refElement = document.querySelector<HTMLElement>(refSelector);
-    if (!refElement) return;
-
     const headingSpan = document.querySelector<HTMLElement>(headingSelector);
     const subtitle = document.querySelector<HTMLElement>(subtitleSelector);
+
+    // Si l'écran est <= 991px, toujours supprimer le padding
+    if (window.innerWidth <= BREAKPOINT) {
+      if (headingSpan) headingSpan.style.paddingLeft = '';
+      if (subtitle) subtitle.style.paddingLeft = '';
+      return;
+    }
+
+    // Sinon, appliquer le padding synchronisé
+    const refElement = document.querySelector<HTMLElement>(refSelector);
+    if (!refElement) return;
     if (!headingSpan && !subtitle) return;
 
     const refWidth = refElement.offsetWidth;
@@ -447,14 +456,14 @@ export function initHeroPaddingSync(): void {
     if (subtitle) subtitle.style.paddingLeft = `${refWidth}px`;
   };
 
-  // Run once now
-  sync();
-
   // Avoid stacking resize listeners if Webflow re-inits scripts
   const boundKey = 'heroPaddingSyncBound';
   const docEl = document.documentElement as HTMLElement & { dataset: DOMStringMap };
   if (docEl.dataset[boundKey] === '1') return;
   docEl.dataset[boundKey] = '1';
+
+  // Run once now
+  sync();
 
   // Recalculate on resize (debounced)
   let resizeTimeout: number | null = null;
