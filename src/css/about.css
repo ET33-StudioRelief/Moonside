@@ -22,7 +22,7 @@
     justify-content: center;
     gap: 2.5rem;
   }
-  
+
   .team_collection-item {
     flex: 0 0 calc(33.333% - 1.67rem); /* 3 colonnes avec gap de 2.5rem */
     max-width: calc(33.333% - 1.67rem);
