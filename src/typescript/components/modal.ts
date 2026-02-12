@@ -97,7 +97,6 @@ export function initContactModal(): void {
 
 /**
  * Validation of the phone field (FR format) for input[type="tel"].
- */
 export function initContactPhoneValidation(): void {
   const phoneInput = document.querySelector('input[type="tel"]') as HTMLInputElement | null;
 
@@ -122,6 +121,43 @@ export function initContactPhoneValidation(): void {
   });
 
   // Réinitialiser l'erreur quand l'utilisateur tape
+  phoneInput.addEventListener('input', () => {
+    phoneInput.setCustomValidity('');
+  });
+}
+ */
+export function initContactPhoneValidation(): void {
+  const phoneInput = document.querySelector('input[type="tel"]') as HTMLInputElement | null;
+
+  if (!phoneInput) {
+    return;
+  }
+
+  // Regex international
+  const phoneRegex =
+    /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,5}[-\s.]?[0-9]{1,6}$/;
+
+  phoneInput.addEventListener('blur', () => {
+    const value = phoneInput.value.trim();
+
+    if (!value) {
+      phoneInput.setCustomValidity('');
+      return;
+    }
+
+    // Compte uniquement les chiffres
+    const digitsOnly = value.replace(/\D/g, '');
+
+    // Minimum 7 chiffres (pour couvrir les pays nordiques)
+    // Maximum 15 chiffres (norme ITU E.164)
+    if (digitsOnly.length < 7 || digitsOnly.length > 15 || !phoneRegex.test(value)) {
+      phoneInput.setCustomValidity('Please enter a valid international phone number.');
+      phoneInput.reportValidity();
+    } else {
+      phoneInput.setCustomValidity('');
+    }
+  });
+
   phoneInput.addEventListener('input', () => {
     phoneInput.setCustomValidity('');
   });

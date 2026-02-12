@@ -13,3 +13,33 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+/* Solution flexbox pour centrer la dernière ligne */
+/* Centrage actif uniquement AU-DESSUS de 1300px */
+@media (min-width: 1301px) {
+  .team_collection-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2.5rem;
+  }
+  
+  .team_collection-item {
+    flex: 0 0 calc(33.333% - 1.67rem); /* 3 colonnes avec gap de 2.5rem */
+    max-width: calc(33.333% - 1.67rem);
+  }
+}
+
+/* Responsive - en dessous de 1300px, Webflow grid natif reste actif */
+@media (max-width: 991px) {
+  .team_collection-item {
+    flex: 0 0 calc(50% - 1.25rem); /* 2 colonnes */
+    max-width: calc(50% - 1.25rem);
+  }
+}
+
+@media (max-width: 767px) {
+  .team_collection-item {
+    flex: 0 0 100%; /* 1 colonne */
+    max-width: 100%;
+  }
+}
