@@ -8,7 +8,6 @@ export function initHpTestimonialSwiper(): void {
 
   new Swiper(container, {
     modules: [Pagination],
-    loop: true,
     pagination: {
       el: '.swiper-pagination.is-hp-testimonial',
       clickable: true,
