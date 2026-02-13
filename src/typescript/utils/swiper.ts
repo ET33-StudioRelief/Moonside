@@ -8,6 +8,18 @@ export function initHpTestimonialSwiper(): void {
 
   new Swiper(container, {
     modules: [Pagination],
+    spaceBetween: 24,
+    rewind: true, // ou loop: true si tu préfères l’effet de boucle continue
+    // Mobile par défaut : 1 slide / 1 groupe
+    slidesPerView: 1,
+    slidesPerGroup: 1,
+    // À partir de 992px : 2 slides visibles, navigation par 2 → 3 bullets
+    breakpoints: {
+      992: {
+        slidesPerView: 2,
+        slidesPerGroup: 2,
+      },
+    },
     pagination: {
       el: '.swiper-pagination.is-hp-testimonial',
       clickable: true,
