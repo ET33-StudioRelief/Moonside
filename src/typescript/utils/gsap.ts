@@ -52,9 +52,9 @@ export function initCaseSvgMorph(): void {
 }
 
 /**
- * Init scroll-follow pour la section advantages :
- * l'élément #advantages-sroll-svg suit le scroll à l'intérieur
- * de sa colonne .advantages_animate-col, jusqu'en bas.
+ * Scroll-follow pour la section advantages.
+ * Le cercle suit le scroll à l'intérieur de .advantages_animate-col,
+ * sur mobile et desktop, de façon responsive.
  */
 export function initAdvantagesScrollFollow(): void {
   const container = document.querySelector('.advantages_animate-col') as HTMLElement | null;
@@ -64,27 +64,53 @@ export function initAdvantagesScrollFollow(): void {
     return;
   }
 
-  // Animation liée au scroll
-  gsap.to(circle, {
-    y: () => {
-      const containerHeight = container.clientHeight;
-      const circleHeight = circle.clientHeight;
-      const topPx = parseFloat(getComputedStyle(circle).top || '0'); // ex: -2rem
-      const bottomPadding = parseFloat(getComputedStyle(container).paddingBottom || '0');
+  const computeY = () => {
+    const containerHeight = container.clientHeight;
+    const circleHeight = circle.clientHeight;
+    const topPx = parseFloat(getComputedStyle(circle).top || '0'); // ex: -2rem
+    const bottomPadding = parseFloat(getComputedStyle(container).paddingBottom || '0');
 
-      // On calcule le déplacement nécessaire pour que le bas du cercle
-      // descende légèrement dans la zone de padding-bottom
-      // (on laisse la moitié du padding comme marge visuelle).
-      const effectivePadding = bottomPadding * 0.5;
-      const distance = containerHeight - effectivePadding - circleHeight - topPx;
-      return distance > 0 ? distance : 0;
+    const effectivePadding = bottomPadding * 0.5;
+    const distance = containerHeight - effectivePadding - circleHeight - topPx;
+    return distance > 0 ? distance : 0;
+  };
+
+  const triggerId = 'advantages-scroll-follow';
+  ScrollTrigger.getById(triggerId)?.kill();
+  gsap.killTweensOf(circle);
+
+  ScrollTrigger.matchMedia({
+    // Mobile
+    '(max-width: 767px)': () => {
+      gsap.to(circle, {
+        y: computeY,
+        ease: 'none',
+        scrollTrigger: {
+          id: triggerId,
+          trigger: container,
+          // commence très tard : le haut de la colonne arrive à ~90% de la hauteur du viewport
+          start: 'top top',
+          end: 'bottom top',
+          scrub: true,
+          invalidateOnRefresh: true,
+        },
+      });
     },
-    ease: 'none',
-    scrollTrigger: {
-      trigger: container,
-      start: 'top center',
-      end: 'bottom center',
-      scrub: true,
+
+    // Tablet + desktop
+    '(min-width: 768px)': () => {
+      gsap.to(circle, {
+        y: computeY,
+        ease: 'none',
+        scrollTrigger: {
+          id: triggerId,
+          trigger: container,
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: true,
+          invalidateOnRefresh: true,
+        },
+      });
     },
   });
 }

@@ -165,7 +165,6 @@ export function initServicesFlexSwitcher(): void {
 
 /* Update SVG by Services Item */
 function updateServicesSvgForItem(item: HTMLElement): void {
-  // 1) Dans le parent direct (la colonne texte), on aligne items et SVG par index
   const parent = item.parentElement as HTMLElement | null;
   if (!parent) {
     return;
@@ -191,27 +190,20 @@ function updateServicesSvgForItem(item: HTMLElement): void {
 
   const clone = svgElement.cloneNode(true) as SVGElement;
 
-  // Sur desktop (> 991px), on alimente le conteneur #services-data-embed
-  if (window.innerWidth > 991) {
-    const flex = item.closest('.services_flex') as HTMLElement | null;
-    if (!flex) {
-      return;
-    }
-    const desktopTarget = flex.querySelector('#services-data-embed') as HTMLElement | null;
-    if (!desktopTarget) {
-      return;
-    }
-    desktopTarget.innerHTML = '';
-    desktopTarget.appendChild(clone);
-  } else {
-    // Sur mobile (taille strictement < 992), on cible le conteneur #services-mobile-data-embed dans l'item
-    const mobileTarget = item.querySelector('#services-mobile-data-embed') as HTMLElement | null;
-    if (!mobileTarget) {
-      return;
-    }
-    mobileTarget.innerHTML = '';
-    mobileTarget.appendChild(clone);
+  // Désormais, on insère toujours le SVG cloné dans l'élément
+  // portant l'attribut input-logo="services", que ce soit mobile ou desktop.
+  // - Sur mobile, il se trouve dans l'item.
+  // - Sur desktop, il est dans la colonne image du même .services_flex.
+  const flex = item.closest('.services_flex') as HTMLElement | null;
+  const target =
+    (flex?.querySelector('[input-logo="services"]') as HTMLElement | null) ||
+    (item.querySelector('[input-logo="services"]') as HTMLElement | null);
+  if (!target) {
+    return;
   }
+
+  target.innerHTML = '';
+  target.appendChild(clone);
 }
 
 export function initIndustriesToggle(): void {
