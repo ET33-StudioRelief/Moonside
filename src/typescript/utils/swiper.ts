@@ -37,6 +37,16 @@ export function initHpCaseSwiperMobile(): void {
   const container = document.querySelector('.swiper.is-hp-case-studies') as HTMLElement | null;
   if (!container) return;
 
+  // If there are no slides (empty CMS collection), don't init Swiper
+  const slides = container.querySelectorAll('.swiper-slide');
+  if (slides.length === 0) {
+    if (hpCaseSwiper) {
+      hpCaseSwiper.destroy(true, true);
+      hpCaseSwiper = null;
+    }
+    return;
+  }
+
   // If Webflow re-inits scripts, ensure we don't stack instances
   if (hpCaseSwiper) {
     hpCaseSwiper.destroy(true, true);
