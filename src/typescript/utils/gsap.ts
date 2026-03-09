@@ -67,7 +67,7 @@ export function initAdvantagesScrollFollow(): void {
   const computeY = () => {
     const containerHeight = container.clientHeight;
     const circleHeight = circle.clientHeight;
-    const topPx = parseFloat(getComputedStyle(circle).top || '0'); // ex: -2rem
+    const topPx = parseFloat(getComputedStyle(circle).top || '0');
     const bottomPadding = parseFloat(getComputedStyle(container).paddingBottom || '0');
 
     const effectivePadding = bottomPadding * 0.5;
@@ -76,21 +76,33 @@ export function initAdvantagesScrollFollow(): void {
   };
 
   const triggerId = 'advantages-scroll-follow';
+
+  const getMobileScrollBounds = () => {
+    const attrStart = container.getAttribute('data-advantages-start-mobile');
+    const attrEnd = container.getAttribute('data-advantages-end-mobile');
+
+    return {
+      start: attrStart || 'top top',
+      end: attrEnd || 'bottom top',
+    };
+  };
+
   ScrollTrigger.getById(triggerId)?.kill();
   gsap.killTweensOf(circle);
 
   ScrollTrigger.matchMedia({
     // Mobile
     '(max-width: 767px)': () => {
+      const { start, end } = getMobileScrollBounds();
+
       gsap.to(circle, {
         y: computeY,
         ease: 'none',
         scrollTrigger: {
           id: triggerId,
           trigger: container,
-          // commence très tard : le haut de la colonne arrive à ~90% de la hauteur du viewport
-          start: 'top top',
-          end: 'bottom top',
+          start,
+          end,
           scrub: true,
           invalidateOnRefresh: true,
         },
